@@ -38,14 +38,14 @@
 					<a href="/servicos" class="btn btn-ghost btn-xs text-primary">Operadoras</a>
 				</li>
 				<li>
-					<a href="/servicos/{operator.tag}" class="btn btn-ghost btn-xs text-primary"
-						>{operator.name}</a
-					>
+					<a href="/servicos/{operator.tag}" class="btn btn-ghost btn-xs text-primary">
+						{operator.name}
+					</a>
 				</li>
 				<li>
-					<a href="/servicos/{operator.tag}/paragens" class="btn btn-ghost btn-xs text-primary"
-						>Paragens</a
-					>
+					<a href="/servicos/{operator.tag}/paragens" class="btn btn-ghost btn-xs text-primary">
+						Paragens
+					</a>
 				</li>
 			</ul>
 		</div>
@@ -54,14 +54,33 @@
 			<RouteTitle {route} />
 			<RouteMenu operatorTag={operator.tag} {route} />
 
-			<h2 class="text-xl">Variante a consultar</h2>
-			<select class="select select-primary select-sm w-full" bind:value={$selectedSubrouteId}>
-				{#each route.subroutes as subroute}
-					<option value={subroute.id}>{subroute.flag}</option>
-				{/each}
-			</select>
-
-			<RouteStops subrouteStops={routeStops[$selectedSubrouteId]} />
+			{#if $selectedSubrouteId}
+				<h2 class="text-xl">Variante a consultar</h2>
+				<select class="select select-primary select-sm w-full" bind:value={$selectedSubrouteId}>
+					{#each route.subroutes as subroute}
+						<option value={subroute.id}>{subroute.flag}</option>
+					{/each}
+				</select>
+				<RouteStops subrouteStops={routeStops[$selectedSubrouteId]} />
+			{:else}
+				<div class="alert alert-warning shadow-lg my-4">
+					<div>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							class="stroke-current flex-shrink-0 h-6 w-6"
+							fill="none"
+							viewBox="0 0 24 24"
+							><path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								stroke-width="2"
+								d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+							/></svg
+						>
+						<span>Serviço por definir</span>
+					</div>
+				</div>
+			{/if}
 		</div>
 	</div>
 </div>

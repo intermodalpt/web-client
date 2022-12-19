@@ -18,15 +18,17 @@
 </script>
 
 <div class="title-sr-pair text-3xl">
-	<span
-		class="code"
-		style="
+	{#if route.code}
+		<span
+			class="code"
+			style="
 			background-color: {route.badge_bg};
 			color: {route.badge_text};
 			border: 2px solid {route.badge_text};"
-	>
-		{route.code}
-	</span>
+		>
+			{route.code}
+		</span>
+	{/if}
 	<span class="title">{route.name}</span>
 </div>
 
