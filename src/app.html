@@ -1,0 +1,77 @@
+<!-- Intermodal, transportation information aggregator
+    Copyright (C) 2022  Cláudio Pereira
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU Affero General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU Affero General Public License for more details.
+
+    You should have received a copy of the GNU Affero General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+	<meta charset="UTF-8" />
+	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
+	<meta charset="UTF-8">
+	<meta name="title" content="Intermodal - Mobilidade urbana, amplificada">
+	<meta name="description"
+		content="Agregador de informação de mobilidade. Transportes públicos e acessibilidade na palma da sua mão.">
+	<meta name="keywords" content="Intermodal, mobilidade, transportes, roteamento, acessibilidade">
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://intermodal.pt/">
+	<meta property="og:title" content="Intermodal - Mobilidade urbana, amplificada">
+	<meta property="og:description"
+		content="Agregador de informação de mobilidade. Transportes públicos e acessibilidade na palma da sua mão.">
+	<meta property="og:image" content="https://intermodal.pt/preview.webp">
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="https://intermodal.pt/">
+	<meta property="twitter:title" content="Intermodal - Mobilidade urbana, amplificada">
+	<meta property="twitter:description"
+		content="Agregador de informação de mobilidade. Transportes públicos e acessibilidade na palma da sua mão.">
+	<meta property="twitter:image" content="https://intermodal.pt/preview.webp">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<a rel="me" href="https://masto.pt/@intermodal" style="display: none">Mastodon</a>
+	<title>Intermodal</title>
+	<link rel="preconnect" href="https://fonts.bunny.net">
+	<link href="https://fonts.bunny.net/css?family=roboto:400,400i,700,700i" rel="stylesheet" />
+
+	%sveltekit.head%
+	<style>
+		:root {
+			font-family: "Roboto", sans-serif;
+			height: 100%;
+			background: #fafafa;
+		}
+
+		a {
+			text-decoration: none;
+		}
+
+		#app {
+			display: flex;
+			flex-direction: column;
+			align-items: stretch;
+			min-height: 100%;
+		}
+
+		.content-wrapper {
+			width: min(1200px, 100%);
+			padding: 0px 4px;
+		}
+	</style>
+</head>
+
+<body data-sveltekit-preload-data="hover" class="bg-base-200 min-h-[100%]">
+	<div id="app" class="flex flex-col stretch min-w-[100%]">
+		%sveltekit.body%
+	</div>
+</body>
+
+</html>
