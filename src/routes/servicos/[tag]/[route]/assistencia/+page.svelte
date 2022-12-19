@@ -38,6 +38,14 @@
 					</a>
 				</li>
 				<li>
+					<a
+						href="/servicos/{operator.tag}/{route.id}/informacao"
+						class="btn btn-ghost btn-xs text-primary"
+					>
+						{route.code || route.name}
+					</a>
+				</li>
+				<li>
 					<a href="/servicos/{operator.tag}/assistencia" class="btn btn-ghost btn-xs text-primary">
 						Assistência
 					</a>
