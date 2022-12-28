@@ -51,7 +51,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="/servicos/{operator.tag}/paragens" class="btn btn-ghost btn-xs text-primary">
+					<a href="/servicos/{operator.tag}/{route.id}/paragens" class="btn btn-ghost btn-xs text-primary">
 						Paragens
 					</a>
 				</li>

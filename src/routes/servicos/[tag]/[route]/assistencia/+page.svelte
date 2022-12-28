@@ -46,7 +46,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="/servicos/{operator.tag}/assistencia" class="btn btn-ghost btn-xs text-primary">
+					<a href="/servicos/{operator.tag}/{route.id}/assistencia" class="btn btn-ghost btn-xs text-primary">
 						Assistência
 					</a>
 				</li>

@@ -58,7 +58,7 @@
 					</a>
 				</li>
 				<li>
-					<a href="/servicos/{operator.tag}/percurso" class="btn btn-ghost btn-xs text-primary"
+					<a href="/servicos/{operator.tag}/{route.id}/percurso" class="btn btn-ghost btn-xs text-primary"
 						>Percurso
 					</a>
 				</li>
