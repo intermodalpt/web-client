@@ -50,7 +50,7 @@
 		on:mouseleave={() => onLeave(route.id)}
 	>
 		<div
-			class="flex flex-row items-center rounded-full  border-base-content shrink-0"
+			class="flex flex-row items-center rounded-full  border-base-content shrink-0 bg-base-100"
 			style:border="2px solid {route.badge_text}"
 		>
 			<img
@@ -78,22 +78,31 @@
 	</div>
 	<div class="overflow-hidden max-w-xs mx-auto">
 		<div class="transition-all flex justify-between max-w-lg gap-4 h-20 {open ? '' : '-mt-20'}">
-			<div class="flex flex-col items-center cursor-pointer" on:click={() => gotoRoute(route.id)}>
+			<div
+				class="flex flex-col items-center cursor-pointer"
+				on:click={() => gotoRoute(route.id)}
+				on:keypress={() => gotoRoute(route.id)}
+			>
 				<img class="w-10" src="/icons/route.svg" alt="Percurso" />
 				<span class="text-lg">Percurso</span>
 			</div>
 			<div
 				class="flex flex-col items-center cursor-pointer"
 				on:click={() => gotoSchedule(route.id)}
+				on:keypress={() => gotoSchedule(route.id)}
 			>
 				<img class="w-10" src="/icons/time.svg" alt="Horário" />
 				<span class="text-lg">Horário</span>
 			</div>
-			<div class="flex flex-col items-center cursor-pointer" on:click={() => gotoInfo(route.id)}>
+			<div
+				class="flex flex-col items-center cursor-pointer"
+				on:click={() => gotoInfo(route.id)}
+				on:keypress={() => gotoInfo(route.id)}
+			>
 				<img class="w-10" src="/icons/info.svg" alt="Informação" />
 				<span class="text-lg">Informação</span>
 			</div>
 		</div>
 	</div>
 </div>
-<hr />
+<hr class="sm:-mt-1 sm:-mb-1 ml-6 mr-6" />

@@ -14,21 +14,20 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { apiServer } from '$lib/settings.js';
-	import { stopIcon } from '$lib/assets.js';
-	import { calcRouteMultipoly, stopName } from '$lib/utils.js';
-	import { onMount, tick } from 'svelte';
+	import { onMount } from 'svelte';
 	import { writable, derived } from 'svelte/store';
 	import { browser } from '$app/environment';
 	import L from 'leaflet?client';
 	import 'leaflet.markercluster?client';
 	import 'leaflet.locatecontrol?client';
 	import 'leaflet-lasso?client';
+	import { apiServer } from '$lib/settings.js';
+	import { stopIcon } from '$lib/assets.js';
+	import { calcRouteMultipoly, stopName, sensibleLengthStopName } from '$lib/utils.js';
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 	import CompactSchedule from '$lib/components/map/CompactSchedule.svelte';
-	import RouteListing from '$lib/components/map/RouteListing.svelte';
+	import StopInfo from '$lib/components/map/StopInfo.svelte';
 	import RouteStops from '$lib/components/RouteStops.svelte';
-	import Instructions from '$lib/components/map/Instructions.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -36,15 +35,41 @@
 	const stops = data.stops;
 	const routes = data.routes;
 
-	// $: routeDict = Object.fromEntries(routes.map((route) => [route.id, route]));
+	const stack = writable([]);
+	const lastInStack = derived(stack, ($stack) => $stack[$stack.length - 1]);
 
-	const selectedRouteId = writable(null);
+	const selectedRouteId = derived([lastInStack], ([$lastInStack]) => {
+		return $lastInStack?.routeId;
+	});
+	const selectedStopId = derived([lastInStack], ([$lastInStack]) => {
+		return $lastInStack?.stopId;
+	});
+	const selectedStop = derived([selectedStopId], ([$selectedStopId]) => {
+		if ($selectedStopId === undefined) {
+			return;
+		}
+		return stops[$selectedStopId];
+	});
+
+	const selectedStopPictures = derived(selectedStopId, ($selectedStopId, set) => {
+		if ($selectedStopId) {
+			fetch(`${apiServer}/v1/stops/${$selectedStopId}/pictures`)
+				.then((r) => r.json())
+				.then((data) => {
+					set(data);
+				});
+		} else {
+			set([]);
+		}
+	});
+
 	const selectedSubrouteId = writable(null);
 
 	const selectedRoute = derived([selectedRouteId], ([$selectedRouteId]) => {
 		if ($selectedRouteId === undefined) {
 			return;
 		}
+		$selectedSubrouteId = routes[$selectedRouteId].subroutes[0]?.id
 		return routes[$selectedRouteId];
 	});
 
@@ -58,7 +83,6 @@
 							return [subrouteStops.subroute, subrouteStops.stops.map((stopId) => stops[stopId])];
 						})
 					);
-					console.log(stopsBySubroute);
 					set(stopsBySubroute);
 				});
 		} else {
@@ -76,7 +100,6 @@
 	);
 
 	subrouteStops.subscribe((val) => {
-		console.log(val);
 		if (val && map) {
 			drawSubroute();
 		}
@@ -104,7 +127,7 @@
 		routing: 'routing'
 	};
 
-	let mode = writable(undefined);
+	let mode = writable(modes.learn);
 
 	mode.subscribe(() => {
 		if (!map) {
@@ -149,9 +172,6 @@
 	});
 
 	const zoomLevel = writable(0);
-	const isSelectableZoomLevel = derived(zoomLevel, ($zoomLevel) => {
-		return $zoomLevel >= 14;
-	});
 
 	function zoneColor(zone) {
 		switch (zone) {
@@ -198,6 +218,8 @@
 			}
 		});
 	}
+
+	let showHelp = true;
 
 	function onMunicipalityFeature(feature, layer) {
 		layer.on({
@@ -256,7 +278,6 @@
 		selectedRoutes = Object.keys(spiderMap.routes).map((id) => {
 			return routes[id];
 		});
-		$phase = phases.presenting;
 		drawSpiderMap(spiderMap);
 	}
 
@@ -284,15 +305,143 @@
 				marker.info = stop;
 				marker.stopId = stop.id;
 
-				marker.on('click', (e) => fetchSpiderMap(e.target.stopId));
+				marker.on('click', stopClickHandler);
 				mapLayers.stops.addLayer(marker);
 				stopMarkers[stop.id] = marker;
 			}
 		});
 	}
 
+	function mapClickHandler(e) {
+		console.log('mapClickHandler');
+	}
+
+	function stopClickHandler(e) {
+		$stack = [
+			{
+				activity: 'stopPreselect',
+				stopId: e.target.stopId
+			}
+		];
+	}
+
+	function stopInfoClickHandler(e) {
+		$stack.push({
+			activity: 'stopInfo',
+			stopId: $selectedStopId
+		});
+		$stack = $stack;
+		fetchSpiderMap($selectedStopId);
+	}
+
+	function navigationFromStopHandler(e) {
+		// $stack = [
+		// 	{
+		// 		activity: 'stopInfo',
+		// 		stopId: e.target.stopId
+		// 	}
+		// ];
+	}
+
+	async function openRouteStops(e) {
+		const routeId = e.detail.routeId;
+		$stack.push({
+			activity: 'routeStops',
+			routeId: routeId,
+			stopId: $selectedStopId
+		});
+		$stack = $stack;
+		// TODO el.scrollIntoView(true); the current stop
+	}
+
+	async function openRouteSchedule(e) {
+		const routeId = e.detail.routeId;
+		$stack.push({
+			activity: 'routeSchedule',
+			routeId: routeId,
+			stopId: $selectedStopId
+		});
+		$stack = $stack;
+		// TODO scrollIntoView(true); the current stop
+	}
+
+	async function openRouteInfo(e) {
+		const routeId = e.detail.routeId;
+		$stack.push({
+			activity: 'routeInfo',
+			routeId: routeId,
+			stopId: $selectedStopId
+		});
+		$stack = $stack;
+	}
+
+	function showHelpHandler(e) {
+		console.log('showHelpHandler');
+		showHelp = true;
+	}
+
+	function hintRoute(e) {
+		let routeId = e.detail.routeId;
+		selectedPolylines
+			.filter((line) => {
+				return line.routeId === routeId;
+			})
+			.forEach((line) => {
+				line.bringToFront();
+				line.setStyle({ color: color('p') });
+			});
+	}
+
+	function dropRouteHint(e) {
+		let routeId = e.detail.routeId;
+		selectedPolylines
+			.filter((line) => {
+				return line.routeId === routeId;
+			})
+			.forEach((line) => line.setStyle({ color: 'white' }));
+	}
+
+	function goBack() {
+		$stack.pop();
+		$stack = $stack;
+	}
+
+	function matchFeaturesToZoomLevel() {
+		let newZoomLevel = map.getZoom();
+		$zoomLevel = newZoomLevel;
+
+		if (newZoomLevel >= 14) {
+			mapLayers.stops.addTo(map);
+		} else {
+			mapLayers.stops.removeFrom(map);
+		}
+
+		if (newZoomLevel <= 11 && !selectedRoutes) {
+			mapLayers.municipalities.addTo(map);
+		} else {
+			mapLayers.municipalities.removeFrom(map);
+		}
+		if (newZoomLevel > 11 && newZoomLevel <= 13 && !selectedRoutes) {
+			mapLayers.parishes.addTo(map);
+		} else {
+			mapLayers.parishes.removeFrom(map);
+		}
+
+		// if (newZoomLevel >= 12 || (newZoomLevel >= 10 && touchOriented)) {
+		// 	mapLayers.legend.remove();
+		// } else {
+		// 	mapLayers.legend.addTo(map);
+		// }
+	}
+
+	export function reset() {
+		// selectedDay.set(new Date().toISOString().split('T')[0]);
+		// selectedOperatorId.set(undefined);
+		selectedRouteId.set(undefined);
+		selectedSubrouteId.set(undefined);
+	}
+
 	function drawSpiderMap(spiderMap) {
-		console.log(spiderMap);
 		let stops = spiderMap.stops;
 
 		mapLayers.spiderMap.removeFrom(map);
@@ -353,91 +502,12 @@
 			if (stop.lat && stop.lon) {
 				let marker = L.marker([stop.lat, stop.lon], { icon: stopIcon });
 				marker.on('click', () => {
+					// TODO
 					// selectStop(stop.id);
 				});
 				marker.addTo(mapLayers.subrouteLayer);
 			}
 		}
-	}
-
-	async function openRoute(e) {
-		$selectedRouteId = e.detail.routeId;
-		$phase = phases.route;
-		await tick();
-		let el = document.getElementById('stops');
-		if (el) {
-			el.scrollIntoView(true);
-		}
-	}
-
-	async function openSchedule(e) {
-		$phase = phases.route;
-		$selectedRouteId = e.detail.routeId;
-		await tick();
-		let el = document.getElementById('schedule');
-		if (el) {
-			el.scrollIntoView(true);
-		}
-	}
-
-	async function openInfo(e) {
-		alert('Por fazer');
-	}
-
-	function hintRoute(e) {
-		let routeId = e.detail.routeId;
-		selectedPolylines
-			.filter((line) => {
-				return line.routeId === routeId;
-			})
-			.forEach((line) => {
-				line.bringToFront();
-				line.setStyle({ color: color('p') });
-			});
-	}
-
-	function dropRouteHint(e) {
-		let routeId = e.detail.routeId;
-		selectedPolylines
-			.filter((line) => {
-				return line.routeId === routeId;
-			})
-			.forEach((line) => line.setStyle({ color: 'white' }));
-	}
-
-	function matchFeaturesToZoomLevel() {
-		let newZoomLevel = map.getZoom();
-		$zoomLevel = newZoomLevel;
-
-		if (newZoomLevel >= 14) {
-			mapLayers.stops.addTo(map);
-		} else {
-			mapLayers.stops.removeFrom(map);
-		}
-
-		if (newZoomLevel <= 11 && !selectedRoutes) {
-			mapLayers.municipalities.addTo(map);
-		} else {
-			mapLayers.municipalities.removeFrom(map);
-		}
-		if (newZoomLevel > 11 && newZoomLevel <= 13 && !selectedRoutes) {
-			mapLayers.parishes.addTo(map);
-		} else {
-			mapLayers.parishes.removeFrom(map);
-		}
-
-		if (newZoomLevel >= 12 || (newZoomLevel >= 10 && touchOriented)) {
-			mapLayers.legend.remove();
-		} else {
-			mapLayers.legend.addTo(map);
-		}
-	}
-
-	export function reset() {
-		// selectedDay.set(new Date().toISOString().split('T')[0]);
-		// selectedOperatorId.set(undefined);
-		selectedRouteId.set(undefined);
-		selectedSubrouteId.set(undefined);
 	}
 
 	onMount(() => {
@@ -473,11 +543,12 @@
 		}).setView([38.71856, -9.1372], 10);
 
 		map.on('zoomend', matchFeaturesToZoomLevel);
+		map.on('click', mapClickHandler);
 
 		L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
 			maxZoom: 19,
 			subdomains: ['a', 'b'],
-			attribution: '© OpenStreetMap'
+			attribution: '© OpenStreetMap e contribuidores'
 		}).addTo(map);
 
 		L.control.scale({ imperial: false }).addTo(map);
@@ -519,24 +590,9 @@
 		};
 		info.addTo(map);
 
+		map.attributionControl.setPrefix(false);
+
 		mapLayers.municipalities.addTo(map);
-
-		mapLayers.legend.onAdd = function (map) {
-			const div = L.DomUtil.create('div', 'info legend');
-			div.innerHTML =
-				'' +
-				'<i style="background:#f59f00"></i>Área 1<br>' +
-				'<i style="background:#0ca678"></i>Área 2<br>' +
-				'<i style="background:#ff6b00"></i>Área 3<br>' +
-				'<i style="background:#228be6"></i>Área 4<br>' +
-				'<i style="background:#abb3bb"></i>Independente';
-
-			return div;
-		};
-
-		if (!touchOriented) {
-			mapLayers.legend.addTo(map);
-		}
 	});
 </script>
 
@@ -546,118 +602,126 @@
 </svelte:head>
 
 <div class="inset-0 fixed flex flex-col">
-	{#if $mode === undefined}
-		<div style="z-index: 2000; background-color: #33336699; position: absolute" class="inset-0" />
-	{/if}
 	<div id="map" class="w-full grow" />
 
-	{#if $mode === undefined}
-		<div class="fixed inset-x-0 m-auto  w-full lg:w-[28rem]">
-			<div class="mx-3 p-4 flex flex-col gap-4 rounded-2xl shadow-xl bg-base-100">
-				<span class="text-xl">Como é que podemos ajudar?</span>
-				<div class="ml-4 flex flex-col gap-4">
-					<div class="flex flex-col">
-						<span class="text-lg">Conhecer uma zona</span>
-						<input
-							type="button"
-							value="Consultar"
-							class="btn btn-primary rounded-full"
-							on:mouseup={() => {
-								$mode = modes.learn;
-							}}
-						/>
-					</div>
-					<div class="flex flex-col">
-						<span><span class="text-lg line-through">Alcançar um destino</span> (Futuramente)</span>
-						<input type="button" value="Rotear" disabled class="btn btn-primary rounded-full" />
+	{#if $lastInStack}
+		{#if $lastInStack.activity === 'stopPreselect'}
+			<div
+				class="lg:fixed lg:right-0 lg:bottom-0 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+			>
+				<WHeader backBtn="true" on:back={() => ($stack = [])}>
+					{$selectedStop && sensibleLengthStopName($selectedStop)}
+				</WHeader>
+				<div class="overflow-y-scroll w-full">
+					<div class="p-4 flex flex-col">
+						<span class="text-2xl text-center">Eu quero...</span>
+						<div class="flex flex-wrap justify-evenly ml-2 sm:gap-4">
+							<span
+								class="text-primary btn-ghost cursor-pointer rounded-l-lg sm:rounded-lg modal-button flex flex-col grow items-center shrink-0"
+								on:click={navigationFromStopHandler}
+								on:keypress={navigationFromStopHandler}
+							>
+								<img src="/icons/path2.svg" alt="Caminho" class="h-24" />
+								<span class="text-lg">Obter direções</span>
+							</span>
+							<span
+								class="text-primary btn-ghost cursor-pointer  rounded-r-lg sm:rounded-lg  modal-button flex flex-col grow items-center shrink-0"
+								on:click={stopInfoClickHandler}
+								on:keypress={stopInfoClickHandler}
+							>
+								<img src="/icons/stop-info.svg" alt="Informação" class="h-24" />
+								<span class="text-lg">Consultar paragem</span>
+							</span>
+							<span
+								class="text-primary btn-ghost cursor-pointer  rounded-r-lg sm:rounded-lg  modal-button flex flex-col grow items-center shrink-0"
+								on:click={showHelpHandler}
+								on:keypress={showHelpHandler}
+							>
+								<img src="/icons/help.svg" alt="Ajuda" class="h-24" />
+								<span class="text-lg">Ajuda</span>
+							</span>
+						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	{:else if $mode === modes.learn}
-		{#if $selectedRouteId}
+		{:else if $lastInStack.activity === 'stopInfo'}
+			<div
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+			>
+				<StopInfo
+					stop={selectedStop}
+					spider={currentSpider}
+					{routes}
+					pictures={selectedStopPictures}
+					on:openroute={openRouteStops}
+					on:openschedule={openRouteSchedule}
+					on:openinfo={openRouteInfo}
+					on:hint={hintRoute}
+					on:drophint={dropRouteHint}
+					on:back={goBack}
+				/>
+			</div>
+		{:else if $lastInStack.activity === 'stopInfo'}
+			TODO
+		{:else if $lastInStack.activity === 'routeSchedule'}
+			<div
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem] carousel"
+			>
+				<div id="schedule" class="carousel-item flex flex-col w-full">
+					<WHeader
+						backBtn="true"
+						on:back={goBack}
+						fg={$selectedRoute?.badge_text}
+						bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
+					>
+					<CompactSchedule {selectedRoute} />
+				</div>
+			</div>
+		{:else if $lastInStack.activity === 'routeStops'}
 			<div
 				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem] carousel"
 			>
 				<div id="stops" class="carousel-item flex flex-col gap-1 w-full">
 					<WHeader
 						backBtn="true"
-						on:back={() => {
-							$selectedRouteId = undefined;
-						}}
-						fg={$selectedRoute.badge_text}
-						bg={$selectedRoute.badge_bg}>{$selectedRoute.code}: {$selectedRoute.name}</WHeader
+						on:back={goBack}
+						fg={$selectedRoute?.badge_text}
+						bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
 					>
 					<select class="select select-primary w-full mx-auto" bind:value={$selectedSubrouteId}>
-						{#each $selectedRoute.subroutes as subroute}
+						{#each $selectedRoute?.subroutes || [] as subroute}
 							<option value={subroute.id}>{subroute.flag}</option>
 						{/each}
 					</select>
-					{#if $subrouteStops}
-						<RouteStops subrouteStops={$subrouteStops} />
-					{/if}
+					<div class="ml-2 lg:ml-4">
+						{#if $subrouteStops}
+							<RouteStops subrouteStops={$subrouteStops} />
+						{/if}
+					</div>
 				</div>
-				<div id="schedule" class="carousel-item flex flex-col w-full">
-					<WHeader
-						backBtn="true"
-						on:back={() => {
-							$selectedRouteId = undefined;
-						}}
-						fg={$selectedRoute.badge_text}
-						bg={$selectedRoute.badge_bg}>{$selectedRoute.code}: {$selectedRoute.name}</WHeader
-					>
-					<CompactSchedule />
-				</div>
-			</div>
-		{:else if selectedRoutes}
-			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
-			>
-				<WHeader backBtn="true" on:back={() => ($phase = phases.selecting)}
-					>Rotas encontradas</WHeader
-				>
-				<div class="overflow-y-scroll w-full">
-					<RouteListing
-						bind:selectedRoutes
-						on:openroute={openRoute}
-						on:openschedule={openSchedule}
-						on:openinfo={openInfo}
-						on:hint={hintRoute}
-						on:drophint={dropRouteHint}
-					/>
-				</div>
-			</div>
-		{:else}
-			<div
-				class="lg:fixed right-0 bottom-0 bg-base-100 rounded-t-2xl lg:rounded-t-none lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem]"
-			>
-				<Instructions {isSelectableZoomLevel} />
 			</div>
 		{/if}
 	{/if}
+	{JSON.stringify($lastInStack)}
 </div>
 
-{#if $mode === undefined}
-	<div class="fixed inset-x-0 m-auto  w-full md:w-[28rem]">
-		<div class="mx-3 p-4 flex flex-col gap-4 rounded-2xl shadow-xl bg-base-100">
-			<span class="text-xl">Como é que podemos ajudar?</span>
-			<div class="ml-4 flex flex-col gap-4">
-				<div class="flex flex-col">
-					<span class="text-lg">Conhecer uma zona</span>
-					<input
-						type="button"
-						value="Consultar"
-						class="btn btn-primary rounded-full"
-						on:mouseup={() => {
-							$mode = modes.learn;
-						}}
-					/>
-				</div>
-				<div class="flex flex-col">
-					<span><span class="text-lg line-through">Alcançar um destino</span> (Futuramente)</span>
-					<input type="button" value="Rotear" disabled class="btn btn-primary rounded-full" />
-				</div>
-			</div>
+{#if showHelp}
+	<div style="background-color: #33336699" class="z-[2000] absolute inset-0" />
+	<div
+		class="fixed inset-x-0 m-auto w-full md:w-full max-w-[970px] z-[2001]"
+		style="max-height: calc(100vh - 120px);"
+	>
+		<div class="mx-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-xl  max-h-full">
+			<span class="text-xl">Como utilizar o visualizador</span>
+			<span>Aqui estarão instruções, um dia</span>
+			<div class="max-h-96 overflow-y-auto" />
+			<input
+				type="button"
+				value="Compreendi"
+				class="btn btn-primary rounded-full"
+				on:click={() => (showHelp = false)}
+				on:keypress={() => (showHelp = false)}
+			/>
 		</div>
 	</div>
 {/if}

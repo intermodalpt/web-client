@@ -17,19 +17,19 @@
 	font-weight: bold;
 }
 
-.score-bubble-perfect {
+.score-perfect {
 	background: green;
 }
-.score-bubble-green {
+.score-green {
 	background: greenyellow;
 }
-.score-bubble-yellow {
+.score-yellow {
 	background: yellow;
 }
-.score-bubble-orange {
+.score-orange {
 	background: orange;
 }
-.score-bubble-red {
+.score-red {
 	background: red;
 }
 

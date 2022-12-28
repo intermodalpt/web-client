@@ -26,3 +26,11 @@ export const stopIcon = browser
 			iconAnchor: [8, 8]
 	  })
 	: null;
+
+export const bigStopIcon = browser
+	? L.icon({
+			iconUrl: `/markers/bus-minimal.svg`,
+			iconSize: [32, 32],
+			iconAnchor: [16, 16]
+	  })
+	: null;

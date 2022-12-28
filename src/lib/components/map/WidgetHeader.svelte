@@ -34,7 +34,7 @@
 	{#if backBtn}
 		<div
 			class="btn btn-ghost btn-circle sm:mt-0 sm:mb-0"
-			on:click={goBack}
+			on:click={goBack} on:keypress={goBack}
 			style="border: 2px solid {fg}33"
 		>
 			<svg
@@ -49,7 +49,7 @@
 			</svg>
 		</div>
 	{/if}
-	<div class="text-lg font-bold whitespace-nowrap overflow-hidden flex flex-row gap-1">
+	<div class="text-lg font-bold whitespace-nowrap overflow-hidden flex flex-row gap-1 items-baseline">
 		<slot />
 	</div>
 </div>
