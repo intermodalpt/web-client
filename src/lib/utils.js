@@ -46,6 +46,106 @@ export function stopName(stop) {
 	return stop.short_name || stop.name || stop.official_name || stop.osm_name || '?';
 }
 
+export function longStopName(stop) {
+	return stop.name || stop.short_name || stop.official_name || stop.osm_name || '?';
+}
+
+export function sensibleLengthStopName(stop) {
+	const longName = longStopName(stop);
+	if (longName.length > 100) {
+		return stopName(stop);
+	} else {
+		return longName;
+	}
+}
+
+function scoreBool(truthVal, potentialScore) {
+	if (truthVal === undefined || truthVal === null) {
+		return [0.0, 0.0];
+	} else if (truthVal) {
+		return [potentialScore, potentialScore];
+	} else {
+		return [0.0, potentialScore];
+	}
+}
+
+export function stopScore(stop) {
+	let score = 0.0;
+	let maximum = 0.0;
+
+	let attrScore, attrMaximum;
+
+	[attrScore, attrMaximum] = scoreBool(stop.has_flag, 3.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_schedules, 1.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_sidewalk, 5.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_shelter, 3.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_bench, 1.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_trash_can, 0.5);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_outdated_info, 0.5);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.is_damaged, 0.5);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_crossing, 3.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_accessibility, 1.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_illuminated_path, 1.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_visibility_from_area, 1.0);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.has_visibility_from_within, 0.5);
+	score += attrScore;
+	maximum += attrMaximum;
+	[attrScore, attrMaximum] = scoreBool(stop.is_visible_from_outside, 2.0);
+
+	// TODO illumination
+	// TODO has_abusive_parking should not be a binary value
+	// TODO has_schedules should not be a binary value
+	// TODO is_damaged should not be a binary value
+
+	// Truncate number to 1 decimal place
+	return Math.round((score / maximum) * 10);
+}
+
+export function stopScoreClass(score) {
+	switch (score) {
+		case 0:
+		case 1:
+		case 2:
+			return 'score-red';
+		case 3:
+		case 4:
+			return 'score-orange';
+		case 5:
+		case 6:
+			return 'score-yellow';
+		case 7:
+		case 8:
+		case 9:
+			return 'score-green';
+		default:
+			return 'score-perfect';
+	}
+}
+
 function groupBy(list, keyGetter) {
 	const map = new Map();
 	list.forEach((item) => {
