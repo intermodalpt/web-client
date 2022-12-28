@@ -49,7 +49,7 @@
 	<div class="navbar bg-base-100 shadow-lg rounded-xl">
 		<div class="navbar-start">
 			<div class="">
-				<span class="btn btn-ghost lg:hidden" on:click={() => toggleDD(0)}>
+				<span class="btn btn-ghost lg:hidden" on:click={() => toggleDD(0)} on:keypress={() => toggleDD(0)}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						class="h-5 w-5"
@@ -67,7 +67,7 @@
 				</span>
 				<ul
 					class="menu menu-compact mt-3 p-2 dropdown-content shadow bg-base-100 rounded-box w-52 duration-200 transition-all {$ddClasses}"
-					on:click={() => toggleDD(150)}
+					on:click={() => toggleDD(150)} on:keypress={() => toggleDD(150)}
 				>
 					<li><a href="/rede">Rede</a></li>
 					<li><a href="/servicos">Serviços</a></li>
