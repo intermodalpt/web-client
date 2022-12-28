@@ -30,11 +30,12 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@sveltejs/adapter-node": "^1.0.0",
 		"daisyui": "^2.33.0",
 		"leaflet": "^1.8.0",
 		"leaflet-contextmenu": "1.4.0",
-		"leaflet.markercluster": "1.5.3",
+		"leaflet-lasso": "^2.2.12",
 		"leaflet.locatecontrol": "^0.76.1",
-		"leaflet-lasso": "^2.2.12"
+		"leaflet.markercluster": "1.5.3"
 	}
 }
