@@ -27,6 +27,7 @@
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 	import CompactSchedule from '$lib/components/map/CompactSchedule.svelte';
 	import StopInfo from '$lib/components/map/StopInfo.svelte';
+	import RouteInfo from '$lib/components/map/RouteInfo.svelte';
 	import RouteStops from '$lib/components/RouteStops.svelte';
 
 	/** @type {import('./$types').PageData} */
@@ -69,7 +70,7 @@
 		if ($selectedRouteId === undefined) {
 			return;
 		}
-		$selectedSubrouteId = routes[$selectedRouteId].subroutes[0]?.id
+		$selectedSubrouteId = routes[$selectedRouteId].subroutes[0]?.id;
 		return routes[$selectedRouteId];
 	});
 
@@ -661,13 +662,23 @@
 					on:back={goBack}
 				/>
 			</div>
-		{:else if $lastInStack.activity === 'stopInfo'}
-			TODO
+		{:else if $lastInStack.activity === 'routeInfo'}
+			<div
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+			>
+				<RouteInfo
+					route={selectedRoute}
+					on:openroute={openRouteStops}
+					on:openschedule={openRouteSchedule}
+					on:openinfo={openRouteInfo}
+					on:back={goBack}
+				/>
+			</div>
 		{:else if $lastInStack.activity === 'routeSchedule'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem] carousel"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem]"
 			>
-				<div id="schedule" class="carousel-item flex flex-col w-full">
+				<div id="schedule" class="flex flex-col w-full">
 					<WHeader
 						backBtn="true"
 						on:back={goBack}
@@ -679,30 +690,29 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeStops'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem] carousel"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
 			>
-				<div id="stops" class="carousel-item flex flex-col gap-1 w-full">
 					<WHeader
 						backBtn="true"
 						on:back={goBack}
 						fg={$selectedRoute?.badge_text}
 						bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
 					>
-					<select class="select select-primary w-full mx-auto" bind:value={$selectedSubrouteId}>
-						{#each $selectedRoute?.subroutes || [] as subroute}
-							<option value={subroute.id}>{subroute.flag}</option>
-						{/each}
-					</select>
-					<div class="ml-2 lg:ml-4">
-						{#if $subrouteStops}
-							<RouteStops subrouteStops={$subrouteStops} />
-						{/if}
+					<div class="overflow-y-scroll overflow-x-hidden">
+						<select class="select select-primary w-full mx-auto" bind:value={$selectedSubrouteId}>
+							{#each $selectedRoute?.subroutes || [] as subroute}
+								<option value={subroute.id}>{subroute.flag}</option>
+							{/each}
+						</select>
+						<div class="ml-2 lg:ml-4">
+							{#if $subrouteStops}
+								<RouteStops subrouteStops={$subrouteStops} />
+							{/if}
+						</div>
 					</div>
-				</div>
 			</div>
 		{/if}
 	{/if}
-	{JSON.stringify($lastInStack)}
 </div>
 
 {#if showHelp}
