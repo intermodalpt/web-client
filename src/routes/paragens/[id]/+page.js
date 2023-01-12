@@ -46,11 +46,13 @@ export async function load({ params, fetch }) {
 	});
 
 	const stopSpider = fetch(`${apiServer}/v1/stops/${stopId}/spider`).then((x) => x.json());
+	const stopPictures = fetch(`${apiServer}/v1/stops/${stopId}/pictures`).then((x) => x.json());
 
-	const [stopsData, stopSpiderData, routesData] = await Promise.all([
+	const [stopsData, stopSpiderData, routesData, pictures] = await Promise.all([
 		stopsPromise,
 		stopSpider,
-		routesPromise
+		routesPromise,
+		stopPictures
 	]);
 
 	const accessibleRoutes = Object.keys(stopSpiderData.routes)
@@ -69,6 +71,7 @@ export async function load({ params, fetch }) {
 
 	return {
 		stop: stopsData[stopId],
-		routes: accessibleRoutes
+		routes: accessibleRoutes,
+		pictures: pictures,
 	};
 }
