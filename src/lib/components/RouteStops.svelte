@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { createEventDispatcher } from 'svelte';
+	import { page } from '$app/stores';
 
 	export let subrouteStops;
 
@@ -30,16 +31,30 @@
 		selectedId = stop.id;
 		dispatch('stopClicked', { stop: stop });
 	}
+
+	if (subrouteStops === undefined) {
+		console.log('no stops for');
+		console.log($page);
+	}
 </script>
 
 <ul class="overflow-y-scroll steps steps-vertical w-full">
 	{#each subrouteStops as stop, i}
-		<li
+		<!-- <li
 			on:mouseup={() => stopClicked(stop)}
 			class="step hover:bg-base-200 rounded-xl cursor-pointer"
 			class:step-primary={selectedId == stop.id}
 		>
 			{stopName(stop)}
-		</li>
+		</li> -->
+
+		<a href="/paragens/{stop.id}" target="_blank" rel="noopener noreferrer">
+			<li
+				class="step hover:bg-base-200 rounded-xl cursor-pointer"
+				class:step-primary={selectedId == stop.id}
+			>
+				{stopName(stop)}
+			</li>
+		</a>
 	{/each}
 </ul>
