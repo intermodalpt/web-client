@@ -23,6 +23,7 @@
 	import 'leaflet-lasso?client';
 	import { apiServer } from '$lib/settings.js';
 	import { stopIcon } from '$lib/assets.js';
+	import { stops, routes } from '$lib/stores.js';
 	import { calcRouteMultipoly, stopName, sensibleLengthStopName } from '$lib/utils.js';
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 	import CompactSchedule from '$lib/components/map/CompactSchedule.svelte';
@@ -33,8 +34,10 @@
 	/** @type {import('./$types').PageData} */
 	export let data;
 
-	const stops = data.stops;
-	const routes = data.routes;
+
+	let stopsLoaded = $stops !== undefined;
+	let routesLoaded = $routes !== undefined;
+	$: loading = !stopsLoaded || !routesLoaded;
 
 	const stack = writable([]);
 	const lastInStack = derived(stack, ($stack) => $stack[$stack.length - 1]);
@@ -49,7 +52,7 @@
 		if ($selectedStopId === undefined) {
 			return;
 		}
-		return stops[$selectedStopId];
+		return $stops[$selectedStopId];
 	});
 
 	const selectedStopPictures = derived(selectedStopId, ($selectedStopId, set) => {
@@ -70,18 +73,18 @@
 		if ($selectedRouteId === undefined) {
 			return;
 		}
-		$selectedSubrouteId = routes[$selectedRouteId].subroutes[0]?.id;
-		return routes[$selectedRouteId];
+		$selectedSubrouteId = $routes[$selectedRouteId].subroutes[0]?.id;
+		return $routes[$selectedRouteId];
 	});
 
-	export const selectedRouteStops = derived([selectedRouteId], ([$selectedRouteId], set) => {
+	const selectedRouteStops = derived([selectedRouteId], ([$selectedRouteId], set) => {
 		if ($selectedRouteId) {
 			fetch(`${apiServer}/v1/routes/${$selectedRouteId}/stops`)
 				.then((r) => r.json())
 				.then((data) => {
 					const stopsBySubroute = Object.fromEntries(
 						data.map((subrouteStops) => {
-							return [subrouteStops.subroute, subrouteStops.stops.map((stopId) => stops[stopId])];
+							return [subrouteStops.subroute, subrouteStops.stops.map((stopId) => $stops[stopId])];
 						})
 					);
 					set(stopsBySubroute);
@@ -145,32 +148,32 @@
 		route: 'route'
 	};
 
-	let phase = writable(phases.selecting);
+	// let phase = writable(phases.selecting);
 
-	phase.subscribe((val) => {
-		if (!map) {
-			return;
-		}
+	// phase.subscribe((val) => {
+	// 	if (!map) {
+	// 		return;
+	// 	}
 
-		if (val === phases.selecting) {
-			reset();
-			mapLayers.stops.addTo(map);
-			selectedRoutes = undefined;
-			matchFeaturesToZoomLevel();
-		}
+	// 	if (val === phases.selecting) {
+	// 		reset();
+	// 		mapLayers.stops.addTo(map);
+	// 		selectedRoutes = undefined;
+	// 		matchFeaturesToZoomLevel();
+	// 	}
 
-		if (val !== phases.selecting) {
-			mapLayers.stops.removeFrom(map);
-		}
+	// 	if (val !== phases.selecting) {
+	// 		mapLayers.stops.removeFrom(map);
+	// 	}
 
-		if (val !== phases.route) {
-			mapLayers.subrouteLayer.removeFrom(map);
-		}
+	// 	if (val !== phases.route) {
+	// 		mapLayers.subrouteLayer.removeFrom(map);
+	// 	}
 
-		if (val !== phases.presenting) {
-			mapLayers.spiderMap.removeFrom(map);
-		}
-	});
+	// 	if (val !== phases.presenting) {
+	// 		mapLayers.spiderMap.removeFrom(map);
+	// 	}
+	// });
 
 	const zoomLevel = writable(0);
 
@@ -250,34 +253,10 @@
 		});
 	}
 
-	if (browser) {
-		fetch('/aml.min.geojson')
-			.then((r) => r.json())
-			.then((obj) => {
-				amlgeo = L.geoJSON(obj, {
-					style: (feature) => {
-						return zoneColor(feature.properties.zone);
-					},
-					onEachFeature: onMunicipalityFeature
-				}).addTo(mapLayers.municipalities);
-				if (map) {
-					map.fitBounds(amlgeo.getBounds());
-				}
-			});
-
-		fetch('/freguesias.min.geojson')
-			.then((x) => x.json())
-			.then((obj) => {
-				parishesgeo = L.geoJSON(obj, {
-					onEachFeature: onParishFeature
-				}).addTo(mapLayers.parishes);
-			});
-	}
-
 	function applySpiderMap(spiderMap) {
 		currentSpider = spiderMap;
 		selectedRoutes = Object.keys(spiderMap.routes).map((id) => {
-			return routes[id];
+			return $routes[id];
 		});
 		drawSpiderMap(spiderMap);
 	}
@@ -299,7 +278,7 @@
 	}
 
 	function addStopLayer() {
-		Object.values(stops).forEach((stop) => {
+		Object.values($stops).forEach((stop) => {
 			if (stop.lat && stop.lon) {
 				let marker = L.marker([stop.lat, stop.lon], { icon: stopIcon });
 				marker.bindTooltip(`${stop.id} - ${stopName(stop)}`);
@@ -336,6 +315,7 @@
 	}
 
 	function navigationFromStopHandler(e) {
+		alert('Esta funcionalidade ainda não está públicamente disponível.\nMais uns dias :)');
 		// $stack = [
 		// 	{
 		// 		activity: 'stopInfo',
@@ -435,7 +415,7 @@
 		// }
 	}
 
-	export function reset() {
+	function reset() {
 		// selectedDay.set(new Date().toISOString().split('T')[0]);
 		// selectedOperatorId.set(undefined);
 		selectedRouteId.set(undefined);
@@ -512,6 +492,15 @@
 	}
 
 	onMount(() => {
+		if (!routesLoaded) {
+			fetch(`${apiServer}/v1/routes`)
+				.then((r) => r.json())
+				.then((routeList) => {
+					$routes = Object.fromEntries(routeList.map((route) => [route.id, route]));
+					routesLoaded = true;
+				});
+		}
+
 		mapLayers = {
 			parishes: L.layerGroup(),
 			municipalities: L.layerGroup(),
@@ -525,8 +514,17 @@
 			subrouteLayer: L.layerGroup(),
 			legend: L.control({ position: 'bottomleft' })
 		};
-
-		addStopLayer();
+		if (stopsLoaded) {
+			addStopLayer();
+		} else {
+			fetch(`${apiServer}/v1/stops`)
+				.then((r) => r.json())
+				.then((stopList) => {
+					$stops = Object.fromEntries(stopList.map((stop) => [stop.id, stop]));
+					addStopLayer();
+					stopsLoaded = true;
+				});
+		}
 
 		mapLayers.stops.on('mouseover', () => {
 			mapLayers.selectionArea.removeFrom(map);
@@ -540,8 +538,29 @@
 		map = L.map('map', {
 			maxBounds: new L.LatLngBounds(new L.LatLng(38.3, -10.0), new L.LatLng(39.35, -8.0)),
 			maxBoundsViscosity: 1.0,
-			minZoom: 10
+			minZoom: 10,
+			zoomControl: false
 		}).setView([38.71856, -9.1372], 10);
+
+		fetch('/aml.min.geojson')
+			.then((r) => r.json())
+			.then((obj) => {
+				amlgeo = L.geoJSON(obj, {
+					style: (feature) => {
+						return zoneColor(feature.properties.zone);
+					},
+					onEachFeature: onMunicipalityFeature
+				}).addTo(mapLayers.municipalities);
+				map.fitBounds(amlgeo.getBounds());
+			});
+
+		fetch('/freguesias.min.geojson')
+			.then((x) => x.json())
+			.then((obj) => {
+				parishesgeo = L.geoJSON(obj, {
+					onEachFeature: onParishFeature
+				}).addTo(mapLayers.parishes);
+			});
 
 		map.on('zoomend', matchFeaturesToZoomLevel);
 		map.on('click', mapClickHandler);
@@ -553,29 +572,37 @@
 		}).addTo(map);
 
 		L.control.scale({ imperial: false }).addTo(map);
+
+		L.control
+			.zoom({
+				position: 'bottomleft'
+			})
+			.addTo(map);
+
 		L.control
 			.locate({
 				flyTo: true,
 				strings: {
 					title: 'Ir para a minha posição'
-				}
+				},
+				position: 'bottomleft'
 			})
 			.addTo(map);
-		L.control.lasso({ position: 'topleft' }).addTo(map);
-		map.on('lasso.finished', (event) => {
-			let stopIds = event.layers
-				.map((marker) => {
-					return marker.stopId;
-				})
-				.filter((id) => {
-					return id !== undefined;
-				});
-			if (stopIds.length === 0) {
-				alert('A área escolhida não seleccionou nada');
-			} else {
-				fetchAggregateMap(stopIds);
-			}
-		});
+		// L.control.lasso({ position: 'bottomleft' }).addTo(map);
+		// map.on('lasso.finished', (event) => {
+		// 	let stopIds = event.layers
+		// 		.map((marker) => {
+		// 			return marker.stopId;
+		// 		})
+		// 		.filter((id) => {
+		// 			return id !== undefined;
+		// 		});
+		// 	if (stopIds.length === 0) {
+		// 		alert('A área escolhida não seleccionou nada');
+		// 	} else {
+		// 		fetchAggregateMap(stopIds);
+		// 	}
+		// });
 
 		info.onAdd = function (map) {
 			this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
@@ -652,7 +679,7 @@
 				<StopInfo
 					stop={selectedStop}
 					spider={currentSpider}
-					{routes}
+					routes={$routes}
 					pictures={selectedStopPictures}
 					on:openroute={openRouteStops}
 					on:openschedule={openRouteSchedule}
@@ -692,30 +719,53 @@
 			<div
 				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
 			>
-					<WHeader
-						backBtn="true"
-						on:back={goBack}
-						fg={$selectedRoute?.badge_text}
-						bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
-					>
-					<div class="overflow-y-scroll overflow-x-hidden">
-						<select class="select select-primary w-full mx-auto" bind:value={$selectedSubrouteId}>
-							{#each $selectedRoute?.subroutes || [] as subroute}
-								<option value={subroute.id}>{subroute.flag}</option>
-							{/each}
-						</select>
-						<div class="ml-2 lg:ml-4">
-							{#if $subrouteStops}
-								<RouteStops subrouteStops={$subrouteStops} />
-							{/if}
-						</div>
+				<WHeader
+					backBtn="true"
+					on:back={goBack}
+					fg={$selectedRoute?.badge_text}
+					bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
+				>
+				<div class="overflow-y-scroll overflow-x-hidden">
+					<select class="select select-primary w-full mx-auto" bind:value={$selectedSubrouteId}>
+						{#each $selectedRoute?.subroutes || [] as subroute}
+							<option value={subroute.id}>{subroute.flag}</option>
+						{/each}
+					</select>
+					<div class="ml-2 lg:ml-4">
+						{#if $subrouteStops}
+							<RouteStops subrouteStops={$subrouteStops} />
+						{/if}
 					</div>
+				</div>
 			</div>
 		{/if}
 	{/if}
 </div>
 
-{#if showHelp}
+{#if loading}
+	<div style="background-color: #33336699" class="z-[2000] absolute inset-0" />
+	<div class="fixed inset-x-0 m-auto w-full md:w-96 w z-[2001]">
+		<div
+			class="mx-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-3xl  border-2 border-warning  max-h-full"
+		>
+			<span class="text-xl">A carregar</span>
+			<span
+				>Paragens: <progress
+					class="progress progress-primary w-full"
+					value={stopsLoaded ? 100 : 0}
+					max="100"
+				/></span
+			>
+			<span
+				>Linhas: <progress
+					class="progress progress-primary w-full"
+					value={routesLoaded ? 100 : 0}
+					max="100"
+				/></span
+			>
+		</div>
+	</div>
+{:else if showHelp}
 	<div style="background-color: #33336699" class="z-[2000] absolute inset-0" />
 	<div
 		class="fixed inset-x-0 m-auto w-full md:w-full max-w-[970px] z-[2001]"
