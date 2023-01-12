@@ -18,19 +18,24 @@
 }
 
 .score-perfect {
-	background: green;
+	background: rgb(34, 197, 94);
+	color: rgb(20, 83, 45);
 }
 .score-green {
-	background: greenyellow;
+	background: rgb(132, 204, 22);
+	color: rgb(63, 98, 18);
 }
 .score-yellow {
-	background: yellow;
+	background: rgb(234, 179, 8);
+	color: rgb(113, 63, 18);
 }
 .score-orange {
-	background: orange;
+	background: rgb(249, 115, 22);
+	color: rgb(124, 45, 18);
 }
 .score-red {
-	background: red;
+	background: rgb(239, 68, 68);
+	color: rgb(127, 29, 29);
 }
 
 .marker-cluster-small {
