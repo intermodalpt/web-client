@@ -1,6 +1,6 @@
 /*
     Intermodal, transportation information aggregator
-    Copyright (C) 2022  Cláudio Pereira
+    Copyright (C) 2024  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -17,5 +17,12 @@
 */
 
 export const csr = true;
-export const ssr = true;
+export const ssr = false;
 export const prerender = false;
+
+/** @type {import('./$types').PageLoad} */
+export async function load({ params, fetch }) {
+    return {
+        floatingMenu: true,
+    }
+}

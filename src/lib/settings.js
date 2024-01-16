@@ -16,3 +16,4 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 export const apiServer = "https://api.intermodal.pt";
+export const tileStyle = 'https://tiles2.intermodal.pt/styles/iml/style.json';

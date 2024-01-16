@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022  Cláudio Pereira
+    Copyright (C) 2022 - 2024 Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -14,17 +14,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { writable, derived } from 'svelte/store';
 	import { browser } from '$app/environment';
-	import L from 'leaflet?client';
-	import 'leaflet.markercluster?client';
-	import 'leaflet.locatecontrol?client';
-	import 'leaflet-lasso?client';
-	import { apiServer } from '$lib/settings.js';
-	import { stopIcon } from '$lib/assets.js';
-	import { stops, routes } from '$lib/stores.js';
-	import { calcRouteMultipoly, stopName, sensibleLengthStopName } from '$lib/utils.js';
+	import { Map as Maplibre, NavigationControl, GeolocateControl } from 'maplibre-gl';
+	import 'maplibre-gl/dist/maplibre-gl.css';
+	import polyline from '@mapbox/polyline';
+	import { apiServer, tileStyle } from '$lib/settings.js';
+	import { regionId } from '$lib/stores.js';
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 	import CompactSchedule from '$lib/components/map/CompactSchedule.svelte';
 	import StopInfo from '$lib/components/map/StopInfo.svelte';
@@ -34,13 +31,49 @@
 	/** @type {import('./$types').PageData} */
 	export let data;
 
+	let map;
+	let mapEl;
+	const touchOriented = browser ? window.matchMedia('(pointer: coarse)').matches : false;
 
-	let stopsLoaded = $stops !== undefined;
-	let routesLoaded = $routes !== undefined;
-	$: loading = !stopsLoaded || !routesLoaded;
+	let mapLoaded = false;
+	let stopsLoaded = false;
+	let routesLoaded = false;
+	$: loading = !mapLoaded || !stopsLoaded || !routesLoaded;
+
+	regionId.subscribe(($regionId) => {
+		console.log('regionId', $regionId);
+	});
+
+	let stops = derived([regionId], async ([$regionId], set) => {
+		if (!$regionId) return [];
+		return await fetch(`${apiServer}/v1/regions/${$regionId}/stops`)
+			.then((r) => r.json())
+			.then((data) => {
+				const stops = Object.fromEntries(data.map((stop) => [stop.id, stop]));
+				set(stops);
+				stopsLoaded = true;
+			});
+	});
+
+	let routes = derived([regionId], async ([$regionId], set) => {
+		if (!$regionId) return [];
+		return await fetch(`${apiServer}/v1/regions/${$regionId}/routes`)
+			.then((r) => r.json())
+			.then((data) => {
+				const routes = Object.fromEntries(data.map((stop) => [stop.id, stop]));
+				set(routes);
+				routesLoaded = true;
+			});
+	});
 
 	const stack = writable([]);
 	const lastInStack = derived(stack, ($stack) => $stack[$stack.length - 1]);
+	stack.subscribe((stack) => {
+		console.log('stack', stack);
+	});
+	lastInStack.subscribe((lastInStack) => {
+		console.log('lastInStack', lastInStack);
+	});
 
 	const selectedRouteId = derived([lastInStack], ([$lastInStack]) => {
 		return $lastInStack?.routeId;
@@ -49,7 +82,7 @@
 		return $lastInStack?.stopId;
 	});
 	const selectedStop = derived([selectedStopId], ([$selectedStopId]) => {
-		if ($selectedStopId === undefined) {
+		if (!$selectedStopId) {
 			return;
 		}
 		return $stops[$selectedStopId];
@@ -103,28 +136,65 @@
 		}
 	);
 
-	subrouteStops.subscribe((val) => {
-		if (val && map) {
-			drawSubroute();
+	selectedStopId.subscribe(($selectedStopId) => {
+		if (!mapLoaded) {
+			return;
 		}
+		if (!$selectedStopId) {
+			map.getSource('highlighted-stops').setData({
+				type: 'FeatureCollection',
+				features: []
+			});
+			return;
+		}
+		console.log('selectedStopId', $selectedStopId);
+
+		let selectedStop = $stops[$selectedStopId];
+		map.getSource('highlighted-stops').setData({
+			type: 'FeatureCollection',
+			features: [
+				{
+					type: 'Feature',
+					geometry: {
+						type: 'Point',
+						coordinates: [selectedStop.lon, selectedStop.lat]
+					},
+					id: $selectedStopId
+				}
+			]
+		});
+	});
+	let stopDetailed = derived([selectedStopId], async ([$selectedStopId], set) => {
+		console.log('stopSpider', $selectedStopId);
+		if (!$selectedStopId) return;
+		fetch(`${apiServer}/v1/stops/${$selectedStopId}`)
+			.then((x) => x.json())
+			.then((stop) => {
+				console.log('fetched stop', stop);
+				set(stop);
+			});
 	});
 
-	let map;
-	let amlgeo;
-	let parishesgeo;
-	const touchOriented = browser ? window.matchMedia('(pointer: coarse)').matches : false;
+	let stopSpider = derived([selectedStopId], async ([$selectedStopId], set) => {
+		console.log('stopSpider', $selectedStopId);
+		if (!$selectedStopId) return;
+		fetch(`${apiServer}/v1/stops/${$selectedStopId}/spider`)
+			.then((x) => x.json())
+			.then((spider) => {
+				console.log('fetched spider', spider);
+				set(spider);
+			});
+	});
 
-	const color = (b) => `hsl(${getComputedStyle(document.body).getPropertyValue('--' + b)})`;
+	stopSpider.subscribe((spider) => {
+		console.log('stopSpider.subscribe', spider);
+		if (!spider) return;
 
-	let info;
-
-	let stopMarkers = {};
-	let selectedPolylines = [];
-
-	let currentSpider;
-	let selectedRoutes;
-
-	let mapLayers;
+		const selectedRoutes = Object.keys(spider.routes).map((id) => {
+			return $routes[id];
+		});
+		drawSpiderMap(spider);
+	});
 
 	const modes = {
 		learn: 'learn',
@@ -138,7 +208,6 @@
 			return;
 		}
 		reset();
-		selectedRoutes = undefined;
 		mapLayers.spiderMap.removeFrom(map);
 	});
 
@@ -148,180 +217,94 @@
 		route: 'route'
 	};
 
-	// let phase = writable(phases.selecting);
+	let phase = writable(phases.selecting);
 
-	// phase.subscribe((val) => {
-	// 	if (!map) {
-	// 		return;
-	// 	}
-
-	// 	if (val === phases.selecting) {
-	// 		reset();
-	// 		mapLayers.stops.addTo(map);
-	// 		selectedRoutes = undefined;
-	// 		matchFeaturesToZoomLevel();
-	// 	}
-
-	// 	if (val !== phases.selecting) {
-	// 		mapLayers.stops.removeFrom(map);
-	// 	}
-
-	// 	if (val !== phases.route) {
-	// 		mapLayers.subrouteLayer.removeFrom(map);
-	// 	}
-
-	// 	if (val !== phases.presenting) {
-	// 		mapLayers.spiderMap.removeFrom(map);
-	// 	}
-	// });
-
-	const zoomLevel = writable(0);
-
-	function zoneColor(zone) {
-		switch (zone) {
-			case 1:
-				return { color: '#f59f00' };
-			case 2:
-				return { color: '#0ca678' };
-			case 3:
-				return { color: '#ff6b00' };
-			case 4:
-				return { color: '#228be6' };
-			default:
-				return { color: '#6f7479' };
+	phase.subscribe((val) => {
+		if (!map) {
+			return;
 		}
+
+		if (val === phases.selecting) {
+			reset();
+		}
+	});
+
+	stops.subscribe(($stops) => {
+		if (!mapLoaded || !$stops) return;
+		updateData();
+	});
+
+	function updateData() {
+		if (!mapLoaded || !$stops) return;
+		drawStops($stops);
 	}
 
-	function onParishFeature(feature, layer) {
-		layer.on({
-			mouseover: (e) => {
-				let layer = e.target;
+	function drawStops(stops) {
+		console.log('drawStops');
+		map.getSource('stops').setData({
+			type: 'FeatureCollection',
+			features: Object.values(stops).map((stop) => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [stop.lon, stop.lat]
+				},
+				properties: {
+					id: stop.id,
+					name: stop.name
+				},
+				id: stop.id
+			}))
+		});
+	}
 
-				layer.setStyle({
-					weight: 5,
-					color: '#666',
-					dashArray: '',
-					fillOpacity: 0.7
-				});
-
-				layer.bringToFront();
-
-				info.update(layer.feature.properties);
-			},
-			mouseout: (e) => {
-				parishesgeo.resetStyle(e.target);
-				info.update();
-			},
-			click: (e) => {
-				let bounds = e.target.getBounds();
-				if (map.getBounds().contains(bounds)) {
-					map.setView(bounds.getCenter(), map.getZoom() + 1);
-				} else {
-					map.zoomIn();
-				}
+	function drawSubroutes(subroutes, stopSequences) {
+		const features = subroutes.map((subroute) => {
+			let coords = [];
+			if (subroute.polyline && subroute.polyline.length > 0) {
+				coords = polyline.decode(subroute.polyline, 6).map((p) => p.reverse());
+			} else {
+				coords =
+					stopSequences[subroute.id]?.map((stopId) => [$stops[stopId].lon, $stops[stopId].lat]) ||
+					[];
 			}
+
+			return {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: coords
+				},
+				properties: {}
+			};
+		});
+
+		map.getSource('subroutes').setData({
+			type: 'FeatureCollection',
+			features: features
 		});
 	}
 
-	let showHelp = true;
+	function drawSpiderMap(spider) {
+		let stops = spider.stops;
 
-	function onMunicipalityFeature(feature, layer) {
-		layer.on({
-			mouseover: (e) => {
-				let layer = e.target;
-
-				layer.setStyle({
-					weight: 5,
-					color: '#666',
-					dashArray: '',
-					fillOpacity: 0.7
-				});
-
-				layer.bringToFront();
-
-				info.update(layer.feature.properties);
-			},
-			mouseout: (e) => {
-				amlgeo.resetStyle(e.target);
-				info.update();
-			},
-			click: (e) => {
-				map.fitBounds(e.target.getBounds());
-				mapLayers.municipalities.removeFrom(map);
-				mapLayers.parishes.addTo(map);
-			}
+		const features = Object.values(spider.subroutes).map((subroute) => {
+			return {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: subroute.stop_sequence.map((stopId) => [
+						stops[stopId].lon,
+						stops[stopId].lat
+					])
+				},
+				properties: {}
+			};
 		});
-	}
-
-	function applySpiderMap(spiderMap) {
-		currentSpider = spiderMap;
-		selectedRoutes = Object.keys(spiderMap.routes).map((id) => {
-			return $routes[id];
+		map.getSource('spider-segments').setData({
+			type: 'FeatureCollection',
+			features: features
 		});
-		drawSpiderMap(spiderMap);
-	}
-
-	function fetchSpiderMap(stopId) {
-		fetch(`${apiServer}/v1/stops/${stopId}/spider`)
-			.then((x) => x.json())
-			.then(applySpiderMap);
-	}
-
-	function fetchAggregateMap(stopIds) {
-		fetch(`${apiServer}/v1/stops/spider`, {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify(stopIds)
-		})
-			.then((x) => x.json())
-			.then(applySpiderMap);
-	}
-
-	function addStopLayer() {
-		Object.values($stops).forEach((stop) => {
-			if (stop.lat && stop.lon) {
-				let marker = L.marker([stop.lat, stop.lon], { icon: stopIcon });
-				marker.bindTooltip(`${stop.id} - ${stopName(stop)}`);
-				marker.info = stop;
-				marker.stopId = stop.id;
-
-				marker.on('click', stopClickHandler);
-				mapLayers.stops.addLayer(marker);
-				stopMarkers[stop.id] = marker;
-			}
-		});
-	}
-
-	function mapClickHandler(e) {
-		console.log('mapClickHandler');
-	}
-
-	function stopClickHandler(e) {
-		$stack = [
-			{
-				activity: 'stopPreselect',
-				stopId: e.target.stopId
-			}
-		];
-	}
-
-	function stopInfoClickHandler(e) {
-		$stack.push({
-			activity: 'stopInfo',
-			stopId: $selectedStopId
-		});
-		$stack = $stack;
-		fetchSpiderMap($selectedStopId);
-	}
-
-	function navigationFromStopHandler(e) {
-		alert('Esta funcionalidade ainda não está públicamente disponível.\nMais uns dias :)');
-		// $stack = [
-		// 	{
-		// 		activity: 'stopInfo',
-		// 		stopId: e.target.stopId
-		// 	}
-		// ];
 	}
 
 	async function openRouteStops(e) {
@@ -347,72 +330,38 @@
 	}
 
 	async function openRouteInfo(e) {
-		const routeId = e.detail.routeId;
-		$stack.push({
-			activity: 'routeInfo',
-			routeId: routeId,
-			stopId: $selectedStopId
-		});
-		$stack = $stack;
-	}
-
-	function showHelpHandler(e) {
-		console.log('showHelpHandler');
-		showHelp = true;
+		// const routeId = e.detail.routeId;
+		// $stack.push({
+		// 	activity: 'routeInfo',
+		// 	routeId: routeId,
+		// 	stopId: $selectedStopId
+		// });
+		// $stack = $stack;
 	}
 
 	function hintRoute(e) {
 		let routeId = e.detail.routeId;
-		selectedPolylines
-			.filter((line) => {
-				return line.routeId === routeId;
-			})
-			.forEach((line) => {
-				line.bringToFront();
-				line.setStyle({ color: color('p') });
-			});
+		console.log(e.detail);
+		if (routeId) {
+			const subroutes = $routes[routeId].subroutes;
+			const subrouteStopSequences = Object.fromEntries(
+				Object.entries($stopSpider?.subroutes)
+					.filter(([id, subroute]) => subroute.route === routeId)
+					.map(([id, sr]) => [id, sr.stop_sequence]) || []
+			);
+			drawSubroutes(subroutes, subrouteStopSequences);
+		} else {
+			drawSubroutes([]);
+		}
 	}
 
 	function dropRouteHint(e) {
-		let routeId = e.detail.routeId;
-		selectedPolylines
-			.filter((line) => {
-				return line.routeId === routeId;
-			})
-			.forEach((line) => line.setStyle({ color: 'white' }));
+		drawSubroutes([]);
 	}
 
 	function goBack() {
 		$stack.pop();
 		$stack = $stack;
-	}
-
-	function matchFeaturesToZoomLevel() {
-		let newZoomLevel = map.getZoom();
-		$zoomLevel = newZoomLevel;
-
-		if (newZoomLevel >= 14) {
-			mapLayers.stops.addTo(map);
-		} else {
-			mapLayers.stops.removeFrom(map);
-		}
-
-		if (newZoomLevel <= 11 && !selectedRoutes) {
-			mapLayers.municipalities.addTo(map);
-		} else {
-			mapLayers.municipalities.removeFrom(map);
-		}
-		if (newZoomLevel > 11 && newZoomLevel <= 13 && !selectedRoutes) {
-			mapLayers.parishes.addTo(map);
-		} else {
-			mapLayers.parishes.removeFrom(map);
-		}
-
-		// if (newZoomLevel >= 12 || (newZoomLevel >= 10 && touchOriented)) {
-		// 	mapLayers.legend.remove();
-		// } else {
-		// 	mapLayers.legend.addTo(map);
-		// }
 	}
 
 	function reset() {
@@ -422,263 +371,210 @@
 		selectedSubrouteId.set(undefined);
 	}
 
-	function drawSpiderMap(spiderMap) {
-		let stops = spiderMap.stops;
-
-		mapLayers.spiderMap.removeFrom(map);
-		mapLayers.spiderMap = L.layerGroup();
-		let bounds;
-
-		// used to have a contour
-		let innerPolyLines = [];
-		Object.values(spiderMap.subroutes).forEach((subroute) => {
-			let segments = calcRouteMultipoly(subroute.stop_sequence.map((stopId) => stops[stopId]));
-
-			let innerPolyline = L.polyline(segments, {
-				color: 'white',
-				weight: 4
-			});
-			innerPolyline.routeId = subroute.route;
-			innerPolyLines.push(innerPolyline);
-			let outerPolyline = L.polyline(segments, {
-				color: '#000',
-				weight: 6
-			}).addTo(mapLayers.spiderMap);
-			bounds = bounds ? bounds.extend(outerPolyline.getBounds()) : outerPolyline.getBounds();
+	function addSourcesAndLayers() {
+		// Display the spider map of a stop
+		map.addSource('spider-segments', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
 		});
-		innerPolyLines.forEach((polyline) => {
-			polyline.addTo(mapLayers.spiderMap);
+		map.addLayer({
+			id: 'spider-segments-outline',
+			type: 'line',
+			source: 'spider-segments',
+			paint: {
+				'line-color': 'rgb(0, 0, 0)',
+				'line-width': 6,
+				'line-opacity': 1
+			}
 		});
-		mapLayers.spiderMap.addTo(map);
-		if (bounds.isValid()) {
-			map.fitBounds(bounds);
-		}
-		selectedPolylines = innerPolyLines;
+		map.addLayer({
+			id: 'spider-segments',
+			type: 'line',
+			source: 'spider-segments',
+			paint: {
+				'line-color': 'rgb(255, 255, 255)',
+				'line-width': 4,
+				'line-opacity': 1
+			}
+		});
+		// ################################
+		// Display a set of subroutes
+		map.addSource('subroutes', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'subroutes-outline',
+			type: 'line',
+			source: 'subroutes',
+			paint: {
+				'line-color': 'rgb(50, 150, 220)',
+				'line-width': 8,
+				'line-opacity': 1
+			}
+		});
+		map.addLayer({
+			id: 'subroutes-segments',
+			type: 'line',
+			source: 'subroutes',
+			paint: {
+				'line-color': 'rgb(255, 255, 255)',
+				'line-width': 6,
+				'line-opacity': 1
+			}
+		});
+		// ################################
+		// Display every stop
+		map.addSource('stops', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'stops',
+			type: 'circle',
+			source: 'stops',
+			paint: {
+				'circle-color': 'rgb(50, 150, 220)',
+				'circle-radius': {
+					stops: [
+						[12, 1.5],
+						[14, 3],
+						[16, 11],
+						[17, 20],
+						[20, 25]
+					]
+				},
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+			}
+		});
+		// ################################
+		// Highlight stops over the regular stops
+		map.addSource('highlighted-stops', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'highlighted-stops',
+			type: 'circle',
+			source: 'highlighted-stops',
+			paint: {
+				'circle-color': 'rgb(255, 0, 0)',
+				'circle-radius': {
+					stops: [
+						[12, 5],
+						[14, 6],
+						[16, 11],
+						[17, 20],
+						[20, 25]
+					]
+				},
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+			}
+		});
 	}
 
-	function drawSubroute() {
-		mapLayers.spiderMap.removeFrom(map);
-		mapLayers.subrouteLayer.removeFrom(map);
-		mapLayers.subrouteLayer = L.layerGroup();
-
-		let segments = calcRouteMultipoly($subrouteStops);
-
-		let outerPolyline = L.polyline(segments, {
-			color: 'black',
-			weight: 6
-		}).addTo(mapLayers.subrouteLayer);
-		let innerPolyline = L.polyline(segments, {
-			color: 'white',
-			weight: 4
-		}).addTo(mapLayers.subrouteLayer);
-		mapLayers.subrouteLayer.addTo(map);
-		let bounds = outerPolyline.getBounds();
-		if (bounds.isValid()) {
-			map.fitBounds(bounds);
-		}
-
-		for (let i = 0; i < $subrouteStops.length; i++) {
-			let stop = $subrouteStops[i];
-
-			if (stop.lat && stop.lon) {
-				let marker = L.marker([stop.lat, stop.lon], { icon: stopIcon });
-				marker.on('click', () => {
-					// TODO
-					// selectStop(stop.id);
-				});
-				marker.addTo(mapLayers.subrouteLayer);
-			}
-		}
+	function addEvents() {
+		map.on('click', 'stops', (e) => {
+			$stack = [
+				{
+					activity: 'stopInfo',
+					stopId: e.features[0].properties.id
+				}
+			];
+		});
 	}
 
 	onMount(() => {
-		if (!routesLoaded) {
-			fetch(`${apiServer}/v1/routes`)
-				.then((r) => r.json())
-				.then((routeList) => {
-					$routes = Object.fromEntries(routeList.map((route) => [route.id, route]));
-					routesLoaded = true;
-				});
-		}
-
-		mapLayers = {
-			parishes: L.layerGroup(),
-			municipalities: L.layerGroup(),
-			stops: L.markerClusterGroup({
-				spiderfyOnMaxZoom: false,
-				showCoverageOnHover: false,
-				disableClusteringAtZoom: 15
-			}),
-			spiderMap: L.layerGroup(),
-			selectionArea: L.layerGroup(),
-			subrouteLayer: L.layerGroup(),
-			legend: L.control({ position: 'bottomleft' })
-		};
-		if (stopsLoaded) {
-			addStopLayer();
-		} else {
-			fetch(`${apiServer}/v1/stops`)
-				.then((r) => r.json())
-				.then((stopList) => {
-					$stops = Object.fromEntries(stopList.map((stop) => [stop.id, stop]));
-					addStopLayer();
-					stopsLoaded = true;
-				});
-		}
-
-		mapLayers.stops.on('mouseover', () => {
-			mapLayers.selectionArea.removeFrom(map);
-		});
-		mapLayers.stops.on('mouseout', () => {
-			mapLayers.selectionArea.addTo(map);
+		map = new Maplibre({
+			container: mapEl,
+			style: tileStyle,
+			center: [-9.0, 38.65],
+			zoom: 10,
+			minZoom: 8,
+			maxZoom: 20
+			// TODO bound to whatever the current region is
+			// maxBounds: [
+			// 	[-10.0, 38.3],
+			// 	[-8.0, 39.35]
+			// ]
 		});
 
-		info = L.control();
+		map.addControl(new NavigationControl(), 'bottom-right');
+		map.addControl(new GeolocateControl(), 'bottom-right');
 
-		map = L.map('map', {
-			maxBounds: new L.LatLngBounds(new L.LatLng(38.3, -10.0), new L.LatLng(39.35, -8.0)),
-			maxBoundsViscosity: 1.0,
-			minZoom: 10,
-			zoomControl: false
-		}).setView([38.71856, -9.1372], 10);
+		map.on('load', function () {
+			addSourcesAndLayers();
+			addEvents();
 
-		fetch('/aml.min.geojson')
-			.then((r) => r.json())
-			.then((obj) => {
-				amlgeo = L.geoJSON(obj, {
-					style: (feature) => {
-						return zoneColor(feature.properties.zone);
-					},
-					onEachFeature: onMunicipalityFeature
-				}).addTo(mapLayers.municipalities);
-				map.fitBounds(amlgeo.getBounds());
-			});
+			mapLoaded = true;
+			updateData();
+		});
+	});
 
-		fetch('/freguesias.min.geojson')
-			.then((x) => x.json())
-			.then((obj) => {
-				parishesgeo = L.geoJSON(obj, {
-					onEachFeature: onParishFeature
-				}).addTo(mapLayers.parishes);
-			});
-
-		map.on('zoomend', matchFeaturesToZoomLevel);
-		map.on('click', mapClickHandler);
-
-		L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			subdomains: ['a', 'b'],
-			attribution: '© OpenStreetMap e contribuidores'
-		}).addTo(map);
-
-		L.control.scale({ imperial: false }).addTo(map);
-
-		L.control
-			.zoom({
-				position: 'bottomleft'
-			})
-			.addTo(map);
-
-		L.control
-			.locate({
-				flyTo: true,
-				strings: {
-					title: 'Ir para a minha posição'
-				},
-				position: 'bottomleft'
-			})
-			.addTo(map);
-		// L.control.lasso({ position: 'bottomleft' }).addTo(map);
-		// map.on('lasso.finished', (event) => {
-		// 	let stopIds = event.layers
-		// 		.map((marker) => {
-		// 			return marker.stopId;
-		// 		})
-		// 		.filter((id) => {
-		// 			return id !== undefined;
-		// 		});
-		// 	if (stopIds.length === 0) {
-		// 		alert('A área escolhida não seleccionou nada');
-		// 	} else {
-		// 		fetchAggregateMap(stopIds);
-		// 	}
-		// });
-
-		info.onAdd = function (map) {
-			this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
-			this.update();
-			return this._div;
-		};
-
-		// method that we will use to update the control based on feature properties passed
-		info.update = function (props) {
-			if (props) {
-				this._div.innerHTML = '<b>' + props.name + '</b><br />';
-			}
-		};
-		info.addTo(map);
-
-		map.attributionControl.setPrefix(false);
-
-		mapLayers.municipalities.addTo(map);
+	onDestroy(() => {
+		mapLoaded = false;
+		map.remove();
 	});
 </script>
 
 <svelte:head>
 	<title>Intermodal - Rede de transportes</title>
-	<meta name="description" content="Rede de transportes disponíveis na AML" />
+	<meta name="description" content="Rede de transportes" />
 </svelte:head>
 
-<div class="inset-0 fixed flex flex-col">
-	<div id="map" class="w-full grow" />
-
-	{#if $lastInStack}
-		{#if $lastInStack.activity === 'stopPreselect'}
-			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+{#if loading}
+	<div style="background-color: #33336699" class="z-[2000] absolute inset-0 backdrop-blur-sm" />
+	<div class="absolute inset-x-0 m-auto w-full md:w-96 w z-[2001] top-32">
+		<div class="m-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-lg max-h-full">
+			<span class="text-center -mt-2 -mb-1">A carregar...</span>
+			<span
+				>Paragens: <progress
+					class="progress progress-primary w-full"
+					value={stopsLoaded ? 100 : 0}
+					max="100"
+				/></span
 			>
-				<WHeader backBtn="true" on:back={() => ($stack = [])}>
-					{$selectedStop && sensibleLengthStopName($selectedStop)}
-				</WHeader>
-				<div class="overflow-y-scroll w-full">
-					<div class="p-4 flex flex-col">
-						<span class="text-2xl text-center">Eu quero...</span>
-						<div class="flex flex-wrap justify-evenly ml-2 sm:gap-4">
-							<span
-								class="text-primary btn-ghost cursor-pointer rounded-l-lg sm:rounded-lg modal-button flex flex-col grow items-center shrink-0"
-								on:click={navigationFromStopHandler}
-								on:keypress={navigationFromStopHandler}
-							>
-								<img src="/icons/path2.svg" alt="Caminho" class="h-24" />
-								<span class="text-lg">Obter direções</span>
-							</span>
-							<span
-								class="text-primary btn-ghost cursor-pointer  rounded-r-lg sm:rounded-lg  modal-button flex flex-col grow items-center shrink-0"
-								on:click={stopInfoClickHandler}
-								on:keypress={stopInfoClickHandler}
-							>
-								<img src="/icons/stop-info.svg" alt="Informação" class="h-24" />
-								<span class="text-lg">Consultar paragem</span>
-							</span>
-							<span
-								class="text-primary btn-ghost cursor-pointer  rounded-r-lg sm:rounded-lg  modal-button flex flex-col grow items-center shrink-0"
-								on:click={showHelpHandler}
-								on:keypress={showHelpHandler}
-							>
-								<img src="/icons/help.svg" alt="Ajuda" class="h-24" />
-								<span class="text-lg">Ajuda</span>
-							</span>
-						</div>
-					</div>
-				</div>
-			</div>
-		{:else if $lastInStack.activity === 'stopInfo'}
+			<span
+				>Linhas: <progress
+					class="progress progress-primary w-full"
+					value={routesLoaded ? 100 : 0}
+					max="100"
+				/></span
+			>
+			<span
+				>Mapa: <progress
+					class="progress progress-primary w-full"
+					value={mapLoaded ? 100 : 0}
+					max="100"
+				/></span
+			>
+		</div>
+	</div>
+{/if}
+
+<div bind:this={mapEl} class="relative h-full">
+	{#if $lastInStack}
+		{#if $lastInStack.activity === 'stopInfo'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+				class="absolute bottom-0 right-0 h-1/2 lg:h-4/5 lg:rounded-tl-xl shadow-lg w-full lg:w-[28rem] bg-base-100 z-10 overflow-hidden border"
 			>
 				<StopInfo
-					stop={selectedStop}
-					spider={currentSpider}
+					stop={$stopDetailed}
+					spider={$stopSpider}
 					routes={$routes}
 					pictures={selectedStopPictures}
 					on:openroute={openRouteStops}
@@ -691,7 +587,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeInfo'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem]"
 			>
 				<RouteInfo
 					route={selectedRoute}
@@ -710,8 +606,9 @@
 						backBtn="true"
 						on:back={goBack}
 						fg={$selectedRoute?.badge_text}
-						bg={$selectedRoute?.badge_bg}>{$selectedRoute?.code}: {$selectedRoute?.name}</WHeader
-					>
+						bg={$selectedRoute?.badge_bg}
+						>{$selectedRoute?.code}: {$selectedRoute?.name}
+					</WHeader>
 					<CompactSchedule {selectedRoute} />
 				</div>
 			</div>
@@ -741,53 +638,3 @@
 		{/if}
 	{/if}
 </div>
-
-{#if loading}
-	<div style="background-color: #33336699" class="z-[2000] absolute inset-0" />
-	<div class="fixed inset-x-0 m-auto w-full md:w-96 w z-[2001]">
-		<div
-			class="mx-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-3xl  border-2 border-warning  max-h-full"
-		>
-			<span class="text-xl">A carregar</span>
-			<span
-				>Paragens: <progress
-					class="progress progress-primary w-full"
-					value={stopsLoaded ? 100 : 0}
-					max="100"
-				/></span
-			>
-			<span
-				>Linhas: <progress
-					class="progress progress-primary w-full"
-					value={routesLoaded ? 100 : 0}
-					max="100"
-				/></span
-			>
-		</div>
-	</div>
-{:else if showHelp}
-	<div style="background-color: #33336699" class="z-[2000] absolute inset-0" />
-	<div
-		class="fixed inset-x-0 m-auto w-full md:w-full max-w-[970px] z-[2001]"
-		style="max-height: calc(100vh - 120px);"
-	>
-		<div class="mx-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-xl  max-h-full">
-			<span class="text-xl">Como utilizar o visualizador</span>
-			<span>Aqui estarão instruções, um dia</span>
-			<div class="max-h-96 overflow-y-auto" />
-			<input
-				type="button"
-				value="Compreendi"
-				class="btn btn-primary rounded-full"
-				on:click={() => (showHelp = false)}
-				on:keypress={() => (showHelp = false)}
-			/>
-		</div>
-	</div>
-{/if}
-
-<style>
-	@import 'leaflet/dist/leaflet.css';
-	@import 'leaflet.markercluster/dist/MarkerCluster.css';
-	@import 'leaflet.locatecontrol/dist/L.Control.Locate.css';
-</style>
