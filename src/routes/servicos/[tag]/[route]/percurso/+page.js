@@ -19,7 +19,8 @@ import { get } from 'svelte/store';
 import { apiServer } from '$lib/settings.js';
 import { operators, operatorIdTagPairs, routes, loadRoutes, stops, loadStops } from '$lib/stores.js';
 
-export const prerender = true;
+export const prerender = false;
+export const ssr = false;
 
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch, depends }) {
@@ -55,6 +56,7 @@ export async function load({ params, fetch, depends }) {
 		});
 
 	return {
+		stops: stopsData,
 		operator: operator,
 		route: route,
 		routeStops: routeStops
