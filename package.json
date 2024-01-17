@@ -33,6 +33,7 @@
 		"@sveltejs/adapter-node": "^3.0",
 		"daisyui": "^4.6",
 		"maplibre-gl": "^3.6.0",
-		"@mapbox/polyline": "^1.2.1"
+		"@mapbox/polyline": "^1.2.1",
+		"dexie": "^4.0.1-beta.6"
 	}
 }

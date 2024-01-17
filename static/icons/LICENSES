@@ -19,7 +19,6 @@ blind.svg
 child.svg
 deaf.svg
 elderly.svg
-gitlab.svg
 guidedog.svg
 info.svg
 mastodon.svg
@@ -28,7 +27,7 @@ video.svg
 wheelchair.svg
 time.svg
 
-Copyright: Openmoji contributors & Cláudio Pereira, 2023
+Copyright: Openmoji cont    ributors & Cláudio Pereira, 2023
 License: Creative Commons Share Alike License 4.0
 path.svg
 path2.svg
@@ -38,3 +37,19 @@ Copyright: FontAwesome
 License: Creative Commons Attribution License 4.0
 arrow-left-solid.svg
 route.svg
+
+Copyright: Mastodon gGmbH
+masto.svg
+
+Copyright: Civilized Discourse Construction Kit, Inc.
+License: Creative Commons Share Alike License 4.0
+discourse.svg
+
+Copyright: Meta
+facebook.svg
+wpp.svg
+
+Copyright: Signal
+License: Might be public domain (as does not meet the criteria for copyright protections)
+signal.svg
+instagram.webp

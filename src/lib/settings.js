@@ -15,5 +15,12 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-export const apiServer = "https://api.intermodal.pt";
+// export const apiServer = "https://api.intermodal.pt";
+export const apiServer = "http://192.168.152.78:1893";
+
 export const tileStyle = 'https://tiles2.intermodal.pt/styles/iml/style.json';
+
+
+const minute = 1000 * 60;
+export const cacheRefreshTime = minute * 60 * 2; // 2 hours
+export const cacheInvalidationTime = minute * 60 * 12; // 12 hours
