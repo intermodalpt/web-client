@@ -71,7 +71,9 @@ export async function load({ params, fetch }) {
 
 	return {
 		stop: stopsData[stopId],
+		stops: stopsData,
 		routes: accessibleRoutes,
 		pictures: pictures,
+		spider: stopSpiderData
 	};
 }

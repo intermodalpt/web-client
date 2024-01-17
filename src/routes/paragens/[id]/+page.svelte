@@ -14,11 +14,14 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { onMount } from 'svelte';
-	import L from 'leaflet?client';
-	import { bigStopIcon } from '$lib/assets.js';
+	import { onMount, onDestroy } from 'svelte';
+	import { writable, derived } from 'svelte/store';
+	import { Map as Maplibre, NavigationControl } from 'maplibre-gl';
+	import 'maplibre-gl/dist/maplibre-gl.css';
+	import polyline from '@mapbox/polyline';
+	import { apiServer, tileStyle } from '$lib/settings.js';
 	import { operators } from '$lib/stores.js';
-	import { stopScore, stopScoreClass } from '$lib/utils.js';
+	import { stopScore, stopScoreClass, longStopName } from '$lib/utils.js';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
@@ -26,34 +29,208 @@
 	const stop = data.stop;
 	const routes = data.routes;
 	const pictures = data.pictures;
+	const stops = data.stops;
+	const spider = data.spider;
 
 	const score = stopScore(stop);
 
-	function stopName() {
-		return stop.name || stop.official_name || stop.osm_name;
+	let map;
+	let mapEl;
+	let mapLoaded = false;
+
+	function setData() {
+		map.getSource('stops').setData({
+			type: 'FeatureCollection',
+			features: Object.values(stops).map((stop) => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [stop.lon, stop.lat]
+				},
+				properties: {}
+			}))
+		});
+
+		let spiderStops = spider.stops;
+		const features = Object.values(spider.subroutes).map((subroute) => {
+			return {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: subroute.stop_sequence.map((stopId) => [
+						spiderStops[stopId].lon,
+						spiderStops[stopId].lat
+					])
+				},
+				properties: {}
+			};
+		});
+		map.getSource('spider-segments').setData({
+			type: 'FeatureCollection',
+			features: features
+		});
+
+		map.getSource('connected-stops').setData({
+			type: 'FeatureCollection',
+			features: Object.values(spiderStops).map((stop) => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [stop.lon, stop.lat]
+				},
+				properties: {
+					id: stop.id,
+					name: stop.name
+				}
+			}))
+		});
+
+		map.getSource('current-stop').setData({
+			type: 'FeatureCollection',
+			features: [
+				{
+					type: 'Feature',
+					geometry: {
+						type: 'Point',
+						coordinates: [stop.lon, stop.lat]
+					},
+					properties: {}
+				}
+			]
+		});
+	}
+
+	function addSourcesAndLayers() {
+		// Display the spider map of a stop
+		map.addSource('spider-segments', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'spider-segments-outline',
+			type: 'line',
+			source: 'spider-segments',
+			paint: {
+				'line-color': 'rgb(0, 0, 0)',
+				'line-width': 6,
+				'line-opacity': 1
+			}
+		});
+		map.addLayer({
+			id: 'spider-segments',
+			type: 'line',
+			source: 'spider-segments',
+			paint: {
+				'line-color': 'rgb(255, 255, 255)',
+				'line-width': 4,
+				'line-opacity': 1
+			}
+		});
+		// ################################
+		// Display every stop
+		map.addSource('stops', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'stops',
+			type: 'circle',
+			source: 'stops',
+			paint: {
+				'circle-color': 'rgb(40, 100, 150)',
+				'circle-radius': {
+					stops: [
+						[12, 0],
+						[14, 5]
+					]
+				}
+			}
+		});
+		// ################################
+		// Highlight stops over the regular stops
+		map.addSource('connected-stops', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'connected-stops',
+			type: 'circle',
+			source: 'connected-stops',
+			paint: {
+				'circle-color': 'rgb(50, 150, 220)',
+				'circle-radius': {
+					stops: [
+						[12, 3],
+						[14, 4],
+						[16, 11],
+						[17, 20],
+						[20, 25]
+					]
+				},
+				'circle-stroke-width': 1,
+				'circle-stroke-color': '#fff'
+			}
+		});
+		// ################################
+		// Highlight stops over the regular stops
+		map.addSource('current-stop', {
+			type: 'geojson',
+			data: {
+				type: 'FeatureCollection',
+				features: []
+			}
+		});
+		map.addLayer({
+			id: 'current-stop',
+			type: 'circle',
+			source: 'current-stop',
+			paint: {
+				'circle-color': '#ff0000',
+				'circle-radius': {
+					stops: [
+						[14, 10],
+						[16, 15],
+						[20, 20]
+					]
+				},
+				'circle-stroke-width': 2,
+				'circle-stroke-color': '#fff'
+			}
+		});
 	}
 
 	onMount(() => {
-		if (!stop.lat || !stop.lon) {
-			return;
-		}
+		map = new Maplibre({
+			container: mapEl,
+			style: tileStyle,
+			center: [stop.lon, stop.lat],
+			zoom: 17,
+			minZoom: 8,
+			maxZoom: 20
+		});
 
-		const map = L.map('stop-map', {
-			maxBounds: new L.LatLngBounds(new L.LatLng(38.3, -10.0), new L.LatLng(39.35, -8.0)),
-			maxBoundsViscosity: 1.0,
-			minZoom: 10
-		}).setView([stop.lat, stop.lon], 16);
+		map.addControl(new NavigationControl(), 'top-right');
 
-		L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			subdomains: ['a', 'b'],
-			attribution: '© OpenStreetMap e contribuidores'
-		}).addTo(map);
+		map.on('load', function () {
+			addSourcesAndLayers();
 
-		let marker = L.marker([stop.lat, stop.lon], { icon: bigStopIcon });
-		marker.addTo(map);
+			mapLoaded = true;
+			setData();
+		});
+	});
 
-		L.control.scale().addTo(map);
+	onDestroy(() => {
+		mapLoaded = false;
+		map.remove();
 	});
 </script>
 
@@ -72,7 +249,7 @@
 		</figure>
 		<div class="card-body">
 			<h2 class="card-title text-3xl">
-				{stopName()}
+				{longStopName(stop)}
 				<span class="stopScore p-1 rounded-full border-2 {stopScoreClass(score)}">{score}</span>
 			</h2>
 			<div class="flex flex-wrap gap-1 pl-2 pr-2 sm:pl-4 sm:pr-3 z-[10000]">
@@ -285,7 +462,8 @@
 	<div class="card card-compact w-full bg-base-100 shadow-md">
 		<div class="card-body">
 			<h2 class="card-title">Localização</h2>
-			<div id="stop-map" class="w-full" style="height: max(60vh, 20rem)" />
+			<div id="stop-map" class="w-full" />
+			<div bind:this={mapEl} class="" style="height: max(60vh, 20rem)" />
 			<div class="flex flex-wrap gap-2">
 				<label class="input-group overflow-auto">
 					{#if stop.street}
@@ -308,9 +486,6 @@
 </div>
 
 <style>
-	@import 'leaflet/dist/leaflet.css';
-	@import 'leaflet.markercluster/dist/MarkerCluster.css';
-
 	.line-number {
 		padding: 0.2em 10px;
 		border-radius: 1em;
