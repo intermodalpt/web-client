@@ -32,11 +32,6 @@
 	"dependencies": {
 		"@sveltejs/adapter-node": "^3.0",
 		"daisyui": "^4.6",
-		"leaflet": "^1.8.0",
-		"leaflet-contextmenu": "1.4.0",
-		"leaflet-lasso": "^2.2.12",
-		"leaflet.locatecontrol": "^0.76.1",
-		"leaflet.markercluster": "1.5.3",
 		"maplibre-gl": "^3.6.0",
 		"@mapbox/polyline": "^1.2.1"
 	}
