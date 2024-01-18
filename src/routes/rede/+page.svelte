@@ -20,8 +20,9 @@
 	import { Map as Maplibre, NavigationControl, GeolocateControl } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import polyline from '@mapbox/polyline';
+	import { liveQuery } from 'dexie';
 	import { apiServer, tileStyle } from '$lib/settings.js';
-	import { regionId } from '$lib/stores.js';
+	import { fetchRoutes, getRoutes, fetchStops, getStops, loadMissing } from '$lib/db';
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 	import CompactSchedule from '$lib/components/map/CompactSchedule.svelte';
 	import StopInfo from '$lib/components/map/StopInfo.svelte';
@@ -40,30 +41,24 @@
 	let routesLoaded = false;
 	$: loading = !mapLoaded || !stopsLoaded || !routesLoaded;
 
-	regionId.subscribe(($regionId) => {
-		console.log('regionId', $regionId);
-	});
+	let stops = liveQuery(() => getStops());
+	let routes = liveQuery(() => getRoutes());
 
-	let stops = derived([regionId], async ([$regionId], set) => {
-		if (!$regionId) return [];
-		return await fetch(`${apiServer}/v1/regions/${$regionId}/stops`)
-			.then((r) => r.json())
-			.then((data) => {
-				const stops = Object.fromEntries(data.map((stop) => [stop.id, stop]));
-				set(stops);
+	async function loadData() {
+		await Promise.all([
+			fetchStops().then((r) => {
 				stopsLoaded = true;
-			});
-	});
-
-	let routes = derived([regionId], async ([$regionId], set) => {
-		if (!$regionId) return [];
-		return await fetch(`${apiServer}/v1/regions/${$regionId}/routes`)
-			.then((r) => r.json())
-			.then((data) => {
-				const routes = Object.fromEntries(data.map((stop) => [stop.id, stop]));
-				set(routes);
+				return r;
+			}),
+			fetchRoutes().then((r) => {
 				routesLoaded = true;
-			});
+				return r;
+			})
+		]);
+	}
+	loadData().then(async () => {
+		console.log('data loaded');
+		await loadMissing();
 	});
 
 	const stack = writable([]);
