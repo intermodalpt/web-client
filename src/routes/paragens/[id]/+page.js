@@ -15,9 +15,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-import { get } from 'svelte/store';
 import { apiServer } from '$lib/settings.js';
-import { routes, loadRoutes, stops, loadStops } from '$lib/stores.js';
 
 export const csr = true;
 export const ssr = false;
@@ -27,53 +25,8 @@ export const prerender = false;
 export async function load({ params, fetch }) {
 	const stopId = params.id;
 
-	let stopsPromise = new Promise((resolve, reject) => {
-		let data = get(stops);
-		if (data === undefined) {
-			resolve(loadStops(fetch));
-		} else {
-			resolve(data);
-		}
-	});
-
-	let routesPromise = new Promise((resolve, reject) => {
-		let data = get(routes);
-		if (data === undefined) {
-			resolve(loadRoutes(fetch));
-		} else {
-			resolve(data);
-		}
-	});
-
-	const stopSpider = fetch(`${apiServer}/v1/stops/${stopId}/spider`).then((x) => x.json());
-	const stopPictures = fetch(`${apiServer}/v1/stops/${stopId}/pictures`).then((x) => x.json());
-
-	const [stopsData, stopSpiderData, routesData, pictures] = await Promise.all([
-		stopsPromise,
-		stopSpider,
-		routesPromise,
-		stopPictures
-	]);
-
-	const accessibleRoutes = Object.keys(stopSpiderData.routes)
-		.map((routeId) => {
-			return routesData[routeId];
-		})
-		.sort((ra, rb) => {
-			if (!ra.code) {
-				return -1;
-			} else if (!rb.code) {
-				return 1;
-			} else {
-				return (parseInt(ra.code) || 10000) - (parseInt(rb.code) || 10000);
-			}
-		});
-
 	return {
-		stop: stopsData[stopId],
-		stops: stopsData,
-		routes: accessibleRoutes,
-		pictures: pictures,
-		spider: stopSpiderData
+		stopId: stopId,
+		stop: await fetch(`${apiServer}/v1/stops/${stopId}`).then((x) => x.json())
 	};
 }

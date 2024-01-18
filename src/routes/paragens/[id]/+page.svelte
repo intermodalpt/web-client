@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022  Cláudio Pereira
+    Copyright (C) 2022 - 2024  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -19,69 +19,101 @@
 	import { Map as Maplibre, NavigationControl } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import polyline from '@mapbox/polyline';
+	import { liveQuery } from 'dexie';
 	import { apiServer, tileStyle } from '$lib/settings.js';
 	import { operators } from '$lib/stores.js';
 	import { stopScore, stopScoreClass, longStopName } from '$lib/utils.js';
+	import {
+		fetchRoutes,
+		getRoutes,
+		fetchStops,
+		getStops,
+		loadMissing,
+		stopsLoaded,
+		routesLoaded
+	} from '$lib/db';
 
 	/** @type {import('./$types').PageData} */
 	export let data;
 
+	const stopId = data.stopId;
 	const stop = data.stop;
-	const routes = data.routes;
-	const pictures = data.pictures;
-	const stops = data.stops;
-	const spider = data.spider;
+
+	const stops = liveQuery(() => getStops());
+	const routes = liveQuery(() => getRoutes());
+	const pictures = writable(null);
+	const spider = writable(null);
 
 	const score = stopScore(stop);
+
+	const accessibleRoutes = derived([routes, spider], ([$routes, $spider]) => {
+		if (!$routesLoaded || !$spider) return null;
+
+		console.log($routes);
+
+		return Object.keys($spider.routes)
+			.map((routeId) => {
+				return $routes[routeId];
+			})
+			.filter((r) => r)
+			.sort((ra, rb) => {
+				if (!ra.code) {
+					return -1;
+				} else if (!rb.code) {
+					return 1;
+				} else {
+					return (parseInt(ra.code) || 10000) - (parseInt(rb.code) || 10000);
+				}
+			});
+	});
 
 	let map;
 	let mapEl;
 	let mapLoaded = false;
 
-	function setData() {
+	async function loadData() {
+		await Promise.all([
+			fetchStops(),
+			fetchRoutes(),
+			fetch(`${apiServer}/v1/stops/${stopId}/pictures`)
+				.then((r) => r.json())
+				.then((data) => {
+					pictures.set(data);
+				}),
+			fetch(`${apiServer}/v1/stops/${stopId}/spider`)
+				.then((r) => r.json())
+				.then((data) => {
+					spider.set(data);
+				})
+		]);
+	}
+	loadData().then(async () => {
+		console.log('data loaded');
+		await loadMissing();
+	});
+
+	stops.subscribe(() => {
+		addStopDataToMap();
+	});
+
+	spider.subscribe(() => {
+		addSpiderDataToMap();
+	});
+
+	function addStopDataToMap() {
+		if (!mapLoaded) {
+			return;
+		}
+
 		map.getSource('stops').setData({
 			type: 'FeatureCollection',
-			features: Object.values(stops).map((stop) => ({
+			features: Object.values($stops).map((stop) => ({
 				type: 'Feature',
 				geometry: {
 					type: 'Point',
 					coordinates: [stop.lon, stop.lat]
 				},
 				properties: {}
-			}))
-		});
-
-		let spiderStops = spider.stops;
-		const features = Object.values(spider.subroutes).map((subroute) => {
-			return {
-				type: 'Feature',
-				geometry: {
-					type: 'LineString',
-					coordinates: subroute.stop_sequence.map((stopId) => [
-						spiderStops[stopId].lon,
-						spiderStops[stopId].lat
-					])
-				},
-				properties: {}
-			};
-		});
-		map.getSource('spider-segments').setData({
-			type: 'FeatureCollection',
-			features: features
-		});
-
-		map.getSource('connected-stops').setData({
-			type: 'FeatureCollection',
-			features: Object.values(spiderStops).map((stop) => ({
-				type: 'Feature',
-				geometry: {
-					type: 'Point',
-					coordinates: [stop.lon, stop.lat]
-				},
-				properties: {
-					id: stop.id,
-					name: stop.name
-				}
 			}))
 		});
 
@@ -97,6 +129,45 @@
 					properties: {}
 				}
 			]
+		});
+	}
+
+	function addSpiderDataToMap() {
+		if (!$spider || !mapLoaded) {
+			return;
+		}
+		let stops = $spider.stops;
+		const features = Object.values($spider.subroutes).map((subroute) => {
+			return {
+				type: 'Feature',
+				geometry: {
+					type: 'LineString',
+					coordinates: subroute.stop_sequence.map((stopId) => [
+						stops[stopId].lon,
+						stops[stopId].lat
+					])
+				},
+				properties: {}
+			};
+		});
+		map.getSource('spider-segments').setData({
+			type: 'FeatureCollection',
+			features: features
+		});
+
+		map.getSource('connected-stops').setData({
+			type: 'FeatureCollection',
+			features: Object.values(stops).map((stop) => ({
+				type: 'Feature',
+				geometry: {
+					type: 'Point',
+					coordinates: [stop.lon, stop.lat]
+				},
+				properties: {
+					id: stop.id,
+					name: stop.name
+				}
+			}))
 		});
 	}
 
@@ -224,7 +295,8 @@
 			addSourcesAndLayers();
 
 			mapLoaded = true;
-			setData();
+			addStopDataToMap();
+			addSpiderDataToMap();
 		});
 	});
 
@@ -237,14 +309,14 @@
 <div class="flex flex-col w-full gap-4 my-2 px-2">
 	<div class="card w-full bg-base-100 shadow-md">
 		<figure>
-			{#if pictures?.length}
+			{#if $pictures?.length}
 				<div
 					class="bg-cover bg-no-repeat bg-center transition-all hover:scale-110 h-32 lg:h-40 w-full"
-					style="background-image: url('https://intermodal-storage-worker.claudioap.workers.dev/medium/{pictures[0]
-						.sha1}/preview')"
+					style="background-image: url('{$pictures[0].url_medium}')"
 				/>
 			{:else}
-				<img src="https://placeimg.com/1200/200/arch" alt="Imagem da paragem" />
+				<!-- TODO put some placeholder here-->
+				<!-- <img src="/icons/picture.svg" alt="Imagem da paragem" /> -->
 			{/if}
 		</figure>
 		<div class="card-body">
@@ -253,21 +325,21 @@
 				<span class="stopScore p-1 rounded-full border-2 {stopScoreClass(score)}">{score}</span>
 			</h2>
 			<div class="flex flex-wrap gap-1 pl-2 pr-2 sm:pl-4 sm:pr-3 z-[10000]">
-				{#if stop?.has_crossing === true}
+				{#if stop.has_crossing === true}
 					<div class="tooltip" data-tip="Com atravessamento de via">
 						<img class="h-12" src="/stopattrs/crossing.svg" alt="Atravessamento de via" />
 					</div>
 				{/if}
-				{#if stop?.has_accessibility === true}
+				{#if stop.has_accessibility === true}
 					<div class="tooltip" data-tip="Adequada a mobilidade reduzida">
 						<img class="h-12" src="/stopattrs/accessible.svg" alt="Mobilidade reduzida" />
 					</div>
 				{/if}
-				{#if stop?.is_illumination_working === false}
+				{#if stop.is_illumination_working === false}
 					<div class="tooltip" data-tip="Falta de iluminação">
 						<img class="h-12" src="/stopattrs/light-none.svg" alt="Falta de iluminação" />
 					</div>
-				{:else if stop?.is_illumination_working === true}
+				{:else if stop.is_illumination_working === true}
 					{#if stop.illumination_strength || 0 > 3}
 						<div class="tooltip" data-tip="Boa iluminação">
 							<img class="h-12" src="/stopattrs/light-full.svg" alt="Boa iluminação" />
@@ -278,12 +350,12 @@
 						</div>
 					{/if}
 				{/if}
-				{#if stop?.has_abusive_parking === true}
+				{#if stop.has_abusive_parking === true}
 					<div class="tooltip" data-tip="Estacionamento abusivo">
 						<img class="h-12" src="/stopattrs/abusive-parking.svg" alt="Estacionamento abusivo" />
 					</div>
 				{/if}
-				{#if stop?.has_accessibility === false}
+				{#if stop.has_accessibility === false}
 					<div class="tooltip" data-tip="Inadequada a mobilidade reduzida">
 						<img
 							class="h-12"
@@ -292,47 +364,47 @@
 						/>
 					</div>
 				{/if}
-				{#if stop?.is_damaged === true}
+				{#if stop.is_damaged === true}
 					<div class="tooltip" data-tip="Danificada">
 						<img class="h-12" src="/stopattrs/damaged.svg" alt="Danificada" />
 					</div>
 				{/if}
-				{#if stop?.has_flag === false || (stop?.has_flag !== true && stop?.has_outdated_info === true)}
+				{#if stop.has_flag === false || (stop.has_flag !== true && stop.has_outdated_info === true)}
 					<div class="tooltip" data-tip="Sem identificação">
 						<img class="h-12" src="/stopattrs/flag-not.svg" alt="Sem identificação" />
 					</div>
 				{/if}
-				{#if stop?.has_schedules === false || (stop?.has_schedules !== true && stop?.has_outdated_info === true)}
+				{#if stop.has_schedules === false || (stop.has_schedules !== true && stop.has_outdated_info === true)}
 					<div class="tooltip" data-tip="Sem horários atualizados">
 						<img class="h-12" src="/stopattrs/schedules-not.svg" alt="Sem horários atualizados" />
 					</div>
 				{/if}
-				{#if stop?.has_sidewalk === false}
+				{#if stop.has_sidewalk === false}
 					<div class="tooltip" data-tip="Sem passeio">
 						<img class="h-12" src="/stopattrs/sidewalk-not.svg" alt="Sem passeio" />
 					</div>
 				{/if}
-				{#if stop?.has_shelter === false}
+				{#if stop.has_shelter === false}
 					<div class="tooltip" data-tip="Sem abrigo">
 						<img class="h-12" src="/stopattrs/shelter-not.svg" alt="Sem abrigo" />
 					</div>
 				{/if}
-				{#if stop?.has_bench === false}
+				{#if stop.has_bench === false}
 					<div class="tooltip" data-tip="Sem banco">
 						<img class="h-12" src="/stopattrs/bench-not.svg" alt="Sem banco" />
 					</div>
 				{/if}
-				{#if stop?.has_trash_can === false}
+				{#if stop.has_trash_can === false}
 					<div class="tooltip" data-tip="Sem balde do lixo">
 						<img class="h-12" src="/stopattrs/garbage-not.svg" alt="Sem balde do lixo" />
 					</div>
 				{/if}
-				{#if stop?.has_visibility_from_area === false}
+				{#if stop.has_visibility_from_area === false}
 					<div class="tooltip" data-tip="Sem visibilidade">
 						<img class="h-12" src="/stopattrs/visibility-not.svg" alt="Sem visibilidade" />
 					</div>
 				{/if}
-				{#if stop?.has_visibility_from_within === false}
+				{#if stop.has_visibility_from_within === false}
 					<div class="tooltip" data-tip="Sem visibilidade exterior">
 						<img
 							class="h-12"
@@ -341,7 +413,7 @@
 						/>
 					</div>
 				{/if}
-				{#if stop?.is_visible_from_outside === false}
+				{#if stop.is_visible_from_outside === false}
 					<div class="tooltip" data-tip="Difícil visibilidade para o motorista">
 						<img
 							class="h-12"
@@ -358,7 +430,7 @@
 					</tr>
 				</thead>
 				<tbody>
-					{#each routes as route}
+					{#each $accessibleRoutes || [] as route}
 						<tr class="cursor-pointer hover">
 							<a href="/servicos/{operators[route.operator]?.tag}/{route.id}/informacao">
 								<th>
@@ -378,47 +450,47 @@
 				</tbody>
 			</table>
 			<div class="flex flex-wrap gap-1">
-				{#if stop?.has_flag === true}
+				{#if stop.has_flag === true}
 					<div class="tooltip z-[10000]" data-tip="Identificada">
 						<img class="h-12" src="/stopattrs/flag.svg" alt="Identificada" />
 					</div>
 				{/if}
-				{#if stop?.has_schedules === true}
+				{#if stop.has_schedules === true}
 					<div class="tooltip z-[10000]" data-tip="Horários">
 						<img class="h-12" src="/stopattrs/schedules.svg" alt="Horários" />
 					</div>
 				{/if}
-				{#if stop?.has_sidewalk === true}
+				{#if stop.has_sidewalk === true}
 					<div class="tooltip z-[10000]" data-tip="Passeio">
 						<img class="h-12" src="/stopattrs/sidewalk.svg" alt="Passeio" />
 					</div>
 				{/if}
-				{#if stop?.has_shelter === true}
+				{#if stop.has_shelter === true}
 					<div class="tooltip z-[10000]" data-tip="Abrigo">
 						<img class="h-12" src="/stopattrs/shelter.svg" alt="Abrigo" />
 					</div>
 				{/if}
-				{#if stop?.has_bench === true}
+				{#if stop.has_bench === true}
 					<div class="tooltip z-[10000]" data-tip="Banco">
 						<img class="h-12" src="/stopattrs/bench.svg" alt="Banco" />
 					</div>
 				{/if}
-				{#if stop?.has_trash_can === true}
+				{#if stop.has_trash_can === true}
 					<div class="tooltip z-[10000]" data-tip="Balde do Lixo">
 						<img class="h-12" src="/stopattrs/garbage.svg" alt="Balde do Lixo" />
 					</div>
 				{/if}
-				{#if stop?.has_visibility_from_area === true}
+				{#if stop.has_visibility_from_area === true}
 					<div class="tooltip z-[10000]" data-tip="Visibilidade">
 						<img class="h-12" src="/stopattrs/visibility.svg" alt="Visibilidade" />
 					</div>
 				{/if}
-				{#if stop?.has_visibility_from_within === true}
+				{#if stop.has_visibility_from_within === true}
 					<div class="tooltip z-[10000]" data-tip="Visibilidade exterior">
 						<img class="h-12" src="/stopattrs/visibility-within.svg" alt="Visibilidade exterior" />
 					</div>
 				{/if}
-				{#if stop?.is_visible_from_outside === true}
+				{#if stop.is_visible_from_outside === true}
 					<div class="tooltip z-[10000]" data-tip="Facilmente visível pelo motorista">
 						<img
 							class="h-12"
@@ -433,9 +505,9 @@
 	<div class="card card-compact w-full bg-base-100 shadow-md">
 		<div class="card-body">
 			<h2 class="card-title">Fotografias</h2>
-			{#if pictures?.length}
+			{#if $pictures?.length}
 				<div class="grid grid-cols-2">
-					{#each pictures as picture}
+					{#each $pictures as picture}
 						{#if !picture.tagged}
 							<div class="p-1 flex justify-center items-center cursor-pointer">
 								<a
