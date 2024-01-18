@@ -566,6 +566,7 @@
 		{#if $lastInStack.activity === 'stopInfo'}
 			<div
 				class="absolute bottom-0 right-0 h-1/2 lg:h-4/5 lg:rounded-tl-xl shadow-lg w-full lg:w-[28rem] bg-base-100 z-10 overflow-hidden border"
+				style="max-height: 50em;"
 			>
 				<StopInfo
 					stop={$stopDetailed}
@@ -582,7 +583,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeInfo'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem]"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem]"
 			>
 				<RouteInfo
 					route={selectedRoute}
@@ -594,7 +595,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeSchedule'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-3/5 bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem]"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem]"
 			>
 				<div id="schedule" class="flex flex-col w-full">
 					<WHeader
