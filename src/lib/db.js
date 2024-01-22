@@ -22,6 +22,15 @@ regionId.subscribe((id) => {
 });
 
 export async function setRegion(id) {
+	if(!id){
+		console.error('Attempted to nullify the region id');
+		return;
+	}
+	if (id == _regionId) {
+		// Prevent cache invalidation over nothing
+		console.log('Region id unchanged');
+		return;
+	}
 	await wipeVolatileCachedData();
 	localStorage.setItem('region', id);
 	regionId.set(id);
