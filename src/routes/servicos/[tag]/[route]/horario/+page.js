@@ -37,18 +37,6 @@ export async function load({ params, fetch }) {
 
 	const date = new Date().toISOString().split('T')[0];
 
-	let routesData = get(routes);
-	if (routesData === undefined) {
-		routesData = await loadRoutes(fetch);
-	}
-
-	let stopsData = get(stops);
-	if (stopsData === undefined) {
-		stopsData = await loadStops(fetch);
-	}
-
-	const route = routesData[routeId];
-
 	const [routeSchedule, dateCalendars] = await Promise.all([
 		fetch(`${apiServer}/v1/routes/${routeId}/schedule`).then((r) => r.json()),
 		fetch(`${apiServer}/v1/operators/${operator.id}/calendars/date/${date}`).then((r) => r.json())

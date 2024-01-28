@@ -18,6 +18,8 @@
 import { get } from 'svelte/store';
 import { operators, operatorIdTagPairs, routes, loadRoutes } from '$lib/stores.js';
 
+export const csr = true;
+export const ssr = true;
 export const prerender = true;
 
 /** @type {import('./$types').PageLoad} */
