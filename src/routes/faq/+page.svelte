@@ -13,90 +13,85 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
-<div class="flex flex-col w-full gap-4 px-2 pb-2">
-	<div class="card bg-base-100 shadow-xl">
+<div class="flex flex-col w-full gap-4 px-2 lg:px-0">
+	<div class="card bg-base-100 shadow-sm">
+		<div class="card-body">
+			<h2 class="card-title">Sobre o projeto</h2>
+			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
+				<div class="collapse-title text-xl font-medium">O quê é que vocês são ao certo?</div>
+				<div class="collapse-content">
+					<p>
+						Somos um projecto que visa focar na mobilidade e qualidade do espaço público. Ainda não
+						é perfeitamente claro o quê é que isso significa a longo prazo pelo que as nossas
+						apostas atuais são o levantamento e processamento de
+						<b>informação dos serviços de mobilidade</b>, a <b>cartografia do espaços públicos</b>
+						(por intremédio do OpenStreetMap), a criação de <b>melhorias à visualização</b> da
+						informação existente e a
+						<b>criação de materiais educativos</b> nestas matérias.
+					</p>
+				</div>
+			</div>
+			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
+				<div class="collapse-title text-xl font-medium">Posso ajudar?</div>
+				<div class="collapse-content">
+					<p>
+						Claro que sim!<br />
+						Visita o nosso programa de ajuda comunitária, as
+						<a class="link link-primary" href="/andorinhas">andorinhas</a>. Caso te convença então
+						contacta-nos.
+					</p>
+				</div>
+			</div>
+			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
+				<div class="collapse-title text-xl font-medium">Financiamento do projeto</div>
+				<div class="collapse-content">
+					<p>
+						Originalmente financiavamos com o nosso próprio dinheiro pessoal, pro bono. Mais
+						recentemente prestamos serviços a entidades como a TML. O projeto vive inteiramente
+						inteiramente dos lucros dessas prestações de serviço. Portanto, o mesmo com menos
+						impostos que empresas não pagam.
+					</p>
+				</div>
+			</div>
+			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
+				<div class="collapse-title text-xl font-medium">Privacidade dos visitantes</div>
+				<div class="collapse-content">
+					<p>
+						Utilizamos o serviço Plausible Analitics enquanto análise de trafego que respeita a
+						privacidade do visitante.
+					</p>
+					<p>
+						Não usamos cookies e não retemos qualquer dado pessoal dos visitantes.<br />
+						Navegue à vontade que não está a ser observado.
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="card bg-base-100 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title">Sobre os transportes</h2>
 			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
 				<div class="collapse-title text-xl font-medium">Representam algum operador?</div>
 				<div class="collapse-content">
 					<p>
-						Não temos qualquer afiliação a operadores de transportes. Estamos no entanto abertos a
-						cooperação.
+						Não temos qualquer afiliação a operadores de transportes, no entanto falamos com alguns.
+						A nossa única colaboração oficial é com a Carris Metropolitana.
 					</p>
 				</div>
 			</div>
 			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
 				<div class="collapse-title text-xl font-medium">
-					O meu transporte não apareceu/atrasou-se/fez um trajeto errado/comeu-me o queijo do
-					frigorífico!
+					O meu transporte não apareceu/atrasou-se/enganou-se/comeu-me o queijo!
 				</div>
 				<div class="collapse-content">
-					<p>Infelizmente não temos uma bola de cristal para avisar de tais incidentes.</p>
 					<p>
-						Caso a operadora não lhe dê uma justificação razoável, coloque uma reclamação no
-						<a class="link link-primary" href="https://www.livroreclamacoes.pt/">
-							livro de reclamações
-						</a>.
+						Não somos responsáveis por isso, no entanto fizemos um guia para o ajudar a expor os
+						seus descontentamentos de forma construtiva.
 					</p>
-					<p>
-						Não reclame com motoristas ou agentes de venda, não reclame nas redes sociais, não
-						utilize plataformas de terceiros. Utilize <b>só e apenas o livro de reclamações</b>.<br
-						/>
-						Procure produzir <b>criticas construtivas</b>. Queixas no livro de reclamações imputam
-						dever legal à entidade de produzir uma justificação. Volumes elevados de queixas levam o
-						regulador a tomar medidas.
-					</p>
-				</div>
-			</div>
-		</div>
-	</div>
-	<div class="card bg-base-100 shadow-xl">
-		<div class="card-body">
-			<h2 class="card-title">Sobre o projeto</h2>
-			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
-				<div class="collapse-title text-xl font-medium">Posso ajudar?</div>
-				<div class="collapse-content">
-					<p>
-						Claro que sim! Podes submeter dados no
-						<a class="link link-primary" href="https://editor.intermodal.pt">nosso editor</a>.
-					</p>
-					<p>
-						Também podes utilizar aplicações como o <a
-							class="link link-primary"
-							href="https://wiki.openstreetmap.org/wiki/StreetComplete">StreetComplete</a
-						>. São uma boa forma de melhorar o mapa com pouco esforço.
-					</p>
-					<p>Se tiveres mestria nos computadores ou fores artista, o nosso código é público.</p>
-					<p>
-						Por fim, faz o favor de nos divulgar. O sucesso do projeto está dependente de
-						visibilidade.
-					</p>
-					<p>
-						Projetos como o
-						<a class="link link-primary" href="https://lisboaparapessoas.pt/contribuir/"
-							>Lisboa Para Pessoas</a
-						> também fazem um trabalho imenso; ajuda-os.
-					</p>
-				</div>
-			</div>
-			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
-				<div class="collapse-title text-xl font-medium">Como é que financiam o projeto?</div>
-				<div class="collapse-content">
-					<p>
-						Com o nosso próprio dinheiro, pro bono. Não existe qualquer financiamento externo, seja
-						por parte de empresas de transportes, do governo ou de qualquer outra entidade privada.
-					</p>
-				</div>
-			</div>
-			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
-				<div class="collapse-title text-xl font-medium">Qual a vossa política de privacidade?</div>
-				<div class="collapse-content">
-					<p>
-						Não usamos cookies nem qualquer outro estratagema para extorquir dados dos visitantes.<br
-						/>
-						Navegue à vontade que não está a ser observado.
-					</p>
+					<div class="flex justify-end">
+						<a class="btn btn-primary" href="/edu/art/sugerir-e-reclamar">Abrir guia</a>
+					</div>
 				</div>
 			</div>
 		</div>
