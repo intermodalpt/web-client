@@ -14,92 +14,11 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { onMount, onDestroy } from 'svelte';
-	import { derived, writable } from 'svelte/store';
-	import { Map as Maplibre, NavigationControl, GeolocateControl } from 'maplibre-gl';
-	import 'maplibre-gl/dist/maplibre-gl.css';
-	import { liveQuery } from 'dexie';
-	import { fetchRegions, getRegions, regionId, setRegion, loadMissing } from '$lib/db';
-	import { tileStyle } from '$lib/settings.js';
-
-	let map;
-	let mapElem;
-	let regionConfirmationModal;
-	let mapGeolocateControl;
-	let isGeolocating = false;
-
-	let mapLoaded = false;
-	let regionsLoaded = false;
-
-	let hoveredRegionId = null;
-	let explicitRegionChange = false;
-
-	const DEFAULT_BOUNDS = [
-		[-11, 36.5],
-		[-5.5, 42.35]
-	];
-
-	const regions = liveQuery(() => getRegions());
-	const pendingRegionId = writable();
-
-	const pendingRegion = derived([regions, pendingRegionId], ([$regions, $pendingRegionId]) => {
-		if (!$pendingRegionId || !$regions) {
-			return null;
-		}
-		return $regions.find((r) => r.id == $pendingRegionId);
-	});
-	const selectedRegion = derived([regions, regionId], ([$regions, $regionId]) => {
-		console.log('$regionId', $regionId);
-		if (!$regionId || !$regions) {
-			console.log('1');
-			return null;
-		}
-		console.log('2');
-		return $regions.find((r) => r.id == $regionId);
-	});
-
-	regions.subscribe((regs) => {
-		drawRegions();
-	});
-
-	pendingRegion.subscribe((region) => {
-		if (!region) {
-			return;
-		}
-		regionConfirmationModal.showModal();
-	});
-
-	async function confirmPendingRegion() {
-		await setRegion($pendingRegionId);
-		explicitRegionChange = false;
-		$pendingRegionId = null;
-	}
-
-	function drawRegions() {
-		if (!mapLoaded || !$regions) {
-			return;
-		}
-		map.getSource('regions').setData({
-			type: 'FeatureCollection',
-			features: $regions.map((region) => ({
-				type: 'Feature',
-				id: region.id,
-				properties: {
-					id: region.id,
-					name: region.name
-				},
-				geometry: region.geometry
-			}))
-		});
-	}
+	import { fetchRegions, loadMissing } from '$lib/db';
 
 	async function loadData() {
 		await Promise.all([
-			fetchRegions().then((r) => {
-				regionsLoaded = true;
-				drawRegions();
-				return r;
-			})
+			fetchRegions()
 			// fetch(`${apiServer}/v1/news&stuff`)
 			// 	.then((r) => r.json())
 			// 	.then((r) => {
@@ -108,148 +27,7 @@
 		]);
 	}
 	loadData().then(async () => {
-		console.log('data loaded');
 		await loadMissing();
-	});
-
-	const regionTabs = {
-		north: 1,
-		center: 2,
-		south: 3
-	};
-	let regionTab = writable();
-
-	regionTab.subscribe((tab) => {
-		switch (tab) {
-			case regionTabs.north:
-				// map.setMaxBounds([
-				// 	[-9.14, 40.44],
-				// 	[-7.95, 42.38]
-				// ]);
-				map.flyTo({
-					center: [-8.62, 41.16],
-					zoom: 7
-				});
-				break;
-			case regionTabs.center:
-				map.setMaxBounds(DEFAULT_BOUNDS);
-				map.flyTo({
-					center: [-9.12, 38.72],
-					zoom: 7
-				});
-				break;
-			case regionTabs.south:
-				map.setMaxBounds(DEFAULT_BOUNDS);
-				map.flyTo({
-					center: [-8.0, 37.14],
-					zoom: 8
-				});
-				break;
-			default:
-				if (map) {
-					map.setMaxBounds(DEFAULT_BOUNDS);
-				}
-		}
-	});
-
-	function addSourcesAndLayers() {
-		map.addSource('regions', {
-			type: 'geojson',
-			data: {
-				type: 'FeatureCollection',
-				features: []
-			}
-		});
-
-		map.addLayer({
-			id: 'regions-fills',
-			type: 'fill',
-			source: 'regions',
-			layout: {},
-			paint: {
-				'fill-color': '#627BC1',
-				'fill-opacity': ['case', ['boolean', ['feature-state', 'hover'], false], 0.2, 0.1]
-			}
-		});
-
-		map.addLayer({
-			id: 'region-borders',
-			type: 'line',
-			source: 'regions',
-			layout: {},
-			paint: {
-				'line-color': '#627BC1',
-				'line-width': 0.5
-			}
-		});
-	}
-
-	function addEvents() {
-		mapGeolocateControl.on('geolocate', (e) => {
-			isGeolocating = false;
-			$regionTab = -1;
-		});
-
-		mapGeolocateControl.on('outofmaxbounds', function () {
-			alert('Aparenta estar fora de Portugal continental.');
-			isGeolocating = false;
-		});
-
-		mapGeolocateControl.on('error', function () {
-			alert('Incapaz de obter a sua localização.');
-			isGeolocating = false;
-		});
-
-		map.on('click', 'regions-fills', (e) => {
-			$pendingRegionId = e.features[0].id;
-		});
-
-		map.on('mousemove', 'regions-fills', (e) => {
-			if (e.features.length > 0) {
-				if (hoveredRegionId) {
-					map.setFeatureState({ source: 'regions', id: hoveredRegionId }, { hover: false });
-				}
-				hoveredRegionId = e.features[0].id;
-				map.setFeatureState({ source: 'regions', id: hoveredRegionId }, { hover: true });
-			}
-		});
-
-		map.on('mouseleave', 'regions-fills', () => {
-			if (hoveredRegionId) {
-				map.setFeatureState({ source: 'regions', id: hoveredRegionId }, { hover: false });
-			}
-			hoveredRegionId = null;
-		});
-	}
-
-	onMount(() => {
-		map = new Maplibre({
-			container: mapElem,
-			style: tileStyle,
-			minZoom: 3,
-			zoom: 3,
-			maxZoom: 11,
-			maxBounds: DEFAULT_BOUNDS,
-			center: [-9.1333, 38.7167]
-		});
-
-		mapGeolocateControl = new GeolocateControl();
-		map.addControl(new NavigationControl(), 'top-right');
-		map.addControl(mapGeolocateControl, 'top-right');
-
-		map.on('load', () => {
-			addSourcesAndLayers();
-			addEvents();
-			mapLoaded = true;
-			if (regionsLoaded) {
-				drawRegions();
-			}
-		});
-	});
-
-	onDestroy(() => {
-		mapLoaded = false;
-		map.remove();
 	});
 </script>
 
@@ -259,104 +37,20 @@
 </svelte:head>
 
 <div
-	class="w-full pt-24 sm:pt-32 pb-[25vw] flex flex-col items-center gap-8"
+	class="w-full pt-24 sm:pt-24 pb-[25vw] flex flex-col items-center gap-8"
 	style="background: url(/top.svg) top no-repeat, url(/footer.svg) bottom no-repeat; background-size: contain"
 >
-	{#if $regionId && !explicitRegionChange}
-		<div class="w-[min(960px,100%)] flex justify-end">
-			<div
-				class="flex flex-col p-4 bg-[#ffffff77] rounded-xl"
-				style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
-			>
-				<span>A sua região está definida como</span>
-				<span
-					class="text-5xl py-2 text-slate-900"
-					style="font-family: Charm, handwriting; text-shadow: 0 1px 0 #ffffffaa"
-					>{$selectedRegion?.name}</span
-				>
-				<div class="flex justify-end opacity-50">
-					<button class="btn btn-sm btn-neutral" on:click={() => (explicitRegionChange = true)}
-						>Mudar</button
-					>
-				</div>
-			</div>
-		</div>
-	{/if}
-	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0">
+	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0 lg:mt-4">
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77]"
+			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
 				<h2 class="card-title">🚧 Obras adiante 🚧</h2>
 				<p>
-					Estamos a melhorar o Intermodal para suportar o país. Durante as próximas semanas o
-					Intermodal poderá não funcionar. Pedimos desculpa.
+					Estamos a melhorar o Intermodal para suportar o país. Durante as próximas semanas a
+					plataforma poderá não funcionar. Pedimos desculpa.
 				</p>
-			</div>
-		</div>
-		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77]"
-			class:hidden={$regionId && !explicitRegionChange}
-			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
-		>
-			<div class="card-body">
-				<h2 class="card-title">Escolha a sua região</h2>
-				<div>
-					<div
-						role="tablist"
-						class="tabs tabs-lg tabs-bordered justify-start"
-						class:hidden={!$regionTab}
-					>
-						<button role="tab" class="tab" on:click={() => ($regionTab = null)}>Voltar</button>
-					</div>
-					<div role="tablist" class="tabs tabs-lg tabs-bordered" class:hidden={$regionTab}>
-						<button
-							role="tab"
-							class="tab"
-							class:tab-active={$regionTab == regionTabs.north}
-							on:click={() => ($regionTab = regionTabs.north)}>Porto</button
-						>
-						<button
-							role="tab"
-							class="tab"
-							class:tab-active={$regionTab == regionTabs.center}
-							on:click={() => ($regionTab = regionTabs.center)}>Lisboa</button
-						>
-						<button
-							role="tab"
-							class="tab"
-							class:tab-active={$regionTab == regionTabs.south}
-							on:click={() => ($regionTab = regionTabs.south)}>Algarve</button
-						>
-					</div>
-					<div
-						bind:this={mapElem}
-						class="w-full h-[50vh] rounded-b-lg relative"
-						class:rounded-tr-lg={$regionTab}
-					>
-						<div
-							class="absolute top-0 w-full h-full z-10 flex flex-col gap-4 justify-center items-center backdrop-blur-md"
-							class:hidden={$regionTab}
-						>
-							{#if isGeolocating}
-								<span class="text-3xl text-neutral">A obter a sua localização</span>
-								<span class="text-lg text-neutral">(pode ter de aceitar)</span>
-								<progress class="progress w-56" />
-							{:else}
-								<span class="text-3xl text-neutral">Escolha a zona do país</span>
-								<button
-									class="btn btn-primary"
-									class:hidden={isGeolocating}
-									on:click={() => {
-										isGeolocating = true;
-										mapGeolocateControl.trigger();
-									}}>Utilizar a minha localização</button
-								>
-							{/if}
-						</div>
-					</div>
-				</div>
 			</div>
 		</div>
 		<div
@@ -506,24 +200,6 @@
 		</div>
 	</div>
 </footer>
-<dialog bind:this={regionConfirmationModal} class="modal modal-bottom sm:modal-middle">
-	<div class="modal-box">
-		<h3 class="font-bold text-lg">Colocar Intermodal em <b>{$pendingRegion?.name || ''}</b>?</h3>
-		<p class="py-4">
-			Esta definição serve para mostrar os serviços relevantes para a sua região. Pode alterar em
-			qualquer momento a partir do menu.
-		</p>
-		<div class="modal-action">
-			<form method="dialog">
-				<button class="btn btn-success" on:click={confirmPendingRegion}>Sim</button>
-				<button class="btn" on:click={() => ($pendingRegionId = null)}>Não</button>
-			</form>
-		</div>
-	</div>
-	<form method="dialog" class="modal-backdrop">
-		<button>Fechar</button>
-	</form>
-</dialog>
 <dialog id="lpp_warning" class="modal modal-bottom sm:modal-middle">
 	<div class="modal-box">
 		<h3 class="font-bold text-lg">Gostaria de interpor por um momento,</h3>
