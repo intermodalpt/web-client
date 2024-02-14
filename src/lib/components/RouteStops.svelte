@@ -23,7 +23,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	function stopName(stop) {
+	function sensibleLengthStopName(stop) {
 		return stop.short_name || stop.name || stop.official_name || stop.osm_name;
 	}
 
@@ -45,7 +45,7 @@
 			class="step hover:bg-base-200 rounded-xl cursor-pointer"
 			class:step-primary={selectedId == stop.id}
 		>
-			{stopName(stop)}
+			{sensibleLengthStopName(stop)}
 		</li> -->
 
 		<a href="/paragens/{stop.id}" target="_blank" rel="noopener noreferrer">
@@ -53,7 +53,7 @@
 				class="step hover:bg-base-200 rounded-xl cursor-pointer"
 				class:step-primary={selectedId == stop.id}
 			>
-				{stopName(stop)}
+				{sensibleLengthStopName(stop)}
 			</li>
 		</a>
 	{/each}

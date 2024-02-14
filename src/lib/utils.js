@@ -15,45 +15,19 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-export function calcRouteMultipoly(routeStops) {
-	let segments = [];
 
-	let currentSegment = [];
-	for (let i = 0; i < routeStops.length - 1; i++) {
-		let firstStop = routeStops[i];
-		let secondStop = routeStops[i + 1];
-		if (firstStop.lon && secondStop.lon) {
-			if (currentSegment.length === 0) {
-				currentSegment.push([firstStop.lat, firstStop.lon]);
-			}
-			currentSegment.push([secondStop.lat, secondStop.lon]);
-		} else {
-			if (currentSegment.length !== 0) {
-				segments.push(currentSegment);
-				currentSegment = [];
-			}
-		}
-	}
-
-	if (currentSegment.length !== 0) {
-		segments.push(currentSegment);
-	}
-
-	return segments;
-}
-
-export function stopName(stop) {
-	return stop.short_name || stop.name || stop.official_name || stop.osm_name || '?';
+export function shortestStopName(stop) {
+	return stop.short_name || stop.name || '?';
 }
 
 export function longStopName(stop) {
-	return stop.name || stop.short_name || stop.official_name || stop.osm_name || '?';
+	return stop.name || stop.short_name || '?';
 }
 
 export function sensibleLengthStopName(stop) {
 	const longName = longStopName(stop);
 	if (longName.length > 100) {
-		return stopName(stop);
+		return shortestStopName(stop);
 	} else {
 		return longName;
 	}
@@ -75,46 +49,48 @@ export function stopScore(stop) {
 
 	let attrScore, attrMaximum;
 
-	[attrScore, attrMaximum] = scoreBool(stop.has_flag, 3.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_flag, 3.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_schedules, 1.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_schedules, 1.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_sidewalk, 5.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_sidewalk, 5.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_shelter, 3.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_shelter, 3.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_bench, 1.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_bench, 1.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_trash_can, 0.5);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_trash_can, 0.5);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_outdated_info, 0.5);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_outdated_info, 0.5);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.is_damaged, 0.5);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.is_damaged, 0.5);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_crossing, 3.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_crossing, 3.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_accessibility, 1.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_accessibility, 1.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_illuminated_path, 1.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_illuminated_path, 1.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_visibility_from_area, 1.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_visibility_from_area, 1.0);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.has_visibility_from_within, 0.5);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.has_visibility_from_within, 0.5);
 	score += attrScore;
 	maximum += attrMaximum;
-	[attrScore, attrMaximum] = scoreBool(stop.is_visible_from_outside, 2.0);
+	[attrScore, attrMaximum] = scoreBool(stop.a11y.is_visible_from_outside, 2.0);
+	score += attrScore;
+	maximum += attrMaximum;
 
 	// TODO illumination
 	// TODO has_abusive_parking should not be a binary value
@@ -122,6 +98,7 @@ export function stopScore(stop) {
 	// TODO is_damaged should not be a binary value
 
 	// Truncate number to 1 decimal place
+	if (maximum === 0) return null;
 	return Math.round((score / maximum) * 10);
 }
 
