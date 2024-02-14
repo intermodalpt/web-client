@@ -15,6 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { page } from '$app/stores';
+	import DbLoadingInfo from '$lib/components/DbLoadingInfo.svelte';
 	import { selectedRegion } from '$lib/db';
 	import RegionPicker from '$lib/components/RegionPicker.client.svelte';
 	import globe from '$lib/icons/ui/globe.svg';
@@ -155,3 +156,5 @@
 		<button>close</button>
 	</form>
 </dialog>
+
+<DbLoadingInfo />
