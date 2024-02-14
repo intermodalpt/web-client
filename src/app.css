@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 .score-perfect {
 	background: rgb(34, 197, 94);
 	color: rgb(20, 83, 45);
@@ -22,92 +21,4 @@
 .score-red {
 	background: rgb(239, 68, 68);
 	color: rgb(127, 29, 29);
-}
-
-.tcb {
-	background: top 0.7em left 0.7em no-repeat url('/logos/tcb.svg'),
-		bottom 0.7em right 0.7em no-repeat url('/veiculos/tcb.svg');
-	background-size: 20%, 60%;
-}
-
-.cmet {
-	background: top 0.7em left 0.7em no-repeat url('/logos/cmet.svg'),
-		bottom 0.7em right 0.7em no-repeat url('/veiculos/cmet.svg');
-	background-size: 35%, 60%;
-}
-
-.cmet.compact {
-	background-size: 40%, 50%;
-}
-
-.mobic {
-	background: top 0.7em left 0.7em no-repeat url('/logos/mobic.svg'),
-		bottom 0.7em right 0.7em no-repeat url('/veiculos/mobic.svg');
-	background-size: 35%, 60%;
-}
-
-.cmet.compact {
-	background-size: 40%, 50%;
-}
-
-.carris {
-	background: top 0.7em left 0.7em no-repeat url('/logos/carris.svg'),
-		bottom 0.7em right 0.7em no-repeat url('/veiculos/carris.svg');
-	background-size: 45%, 60%;
-}
-
-.carris.compact {
-	background-size: 45%, 50%;
-}
-
-.ml {
-	background: top 0.7em left 0.7em no-repeat url('/logos/ml.svg');
-	background-size: 15%;
-}
-
-.mts {
-	background: top 0.7em left 0.7em no-repeat url('/logos/mts.svg');
-	background-size: 22%;
-}
-
-.mts.compact {
-	background-size: 28%;
-}
-
-.cp {
-	background: top 0.7em left 0.7em no-repeat url('/logos/cp.svg'),
-		bottom 0 right 0.7em no-repeat url('/veiculos/cp.svg');
-	background-size: 75%, 55%;
-}
-
-.cp.compact {
-	background-size: 75%, 40%;
-}
-
-.fert {
-	background: top 0.7em left 0.7em no-repeat url('/logos/fertagus.svg'),
-		bottom 0 right 0.7em no-repeat url('/veiculos/fertagus.svg');
-	background-size: 40%, 55%;
-}
-
-.fert.compact {
-	background-size: 40%, 50%;
-}
-
-.ttsl {
-	background: top 0.7em left 0.7em no-repeat url('/logos/ttsl.svg'),
-		bottom 0.7em right 0.7em no-repeat url('/veiculos/ttsl.svg');
-	background-size: 30%, 70%;
-}
-
-.company {
-	border-radius: 12px;
-	background-color: hsl(var(--b2));
-	aspect-ratio: 3.6;
-}
-
-.company.compact {
-	border-radius: 12px;
-	background-color: hsl(var(--b2));
-	aspect-ratio: 5;
 }
