@@ -315,7 +315,8 @@
 				<h3 class="text-xl">Falando connosco</h3>
 				<p>
 					Taboo leva este ponto ao final da lista. Existe imensa motivação a retirar de palavras
-					simpáticas.
+					simpáticas.<br>
+					Temos uma <a class="link" href="/ajuda">pequena história</a>.
 				</p>
 			</div>
 		</div>
