@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+import { writable, derived } from 'svelte/store';
 import { Dexie } from 'dexie';
 import { apiServer, cacheInvalidationTime } from '$lib/settings';
 import { browser } from '$app/environment';
@@ -22,7 +22,7 @@ regionId.subscribe((id) => {
 });
 
 export async function setRegion(id) {
-	if(!id){
+	if (!id) {
 		console.error('Attempted to nullify the region id');
 		return;
 	}
@@ -37,22 +37,39 @@ export async function setRegion(id) {
 }
 
 let _regionsLoaded;
+let _operatorsLoaded;
 let _stopsLoaded;
 let _routesLoaded;
 // let _calendarsLoaded;
 let _parishesLoaded;
 
 export let regionsLoaded = writable(false);
+export let operatorsLoaded = writable(false);
 export let stopsLoaded = writable(false);
 export let routesLoaded = writable(false);
 // export let calendarsLoaded = writable(false);
 export let parishesLoaded = writable(false);
 
 regionsLoaded.subscribe((v) => (_regionsLoaded = v));
+operatorsLoaded.subscribe((v) => (_operatorsLoaded = v));
 stopsLoaded.subscribe((v) => (_stopsLoaded = v));
 routesLoaded.subscribe((v) => (_routesLoaded = v));
 // calendarsLoaded.subscribe((v) => (_calendarsLoaded = v));
 parishesLoaded.subscribe((v) => (_parishesLoaded = v));
+
+export const selectedRegion = derived([regionId], ([$regionId], set) => {
+	if (!$regionId) {
+		return null;
+	}
+
+	let regionIdInt = parseInt($regionId);
+	if (!regionIdInt) {
+		console.error('Invalid region id', $regionId);
+		return;
+	}
+	
+	db.regions.get(regionIdInt).then((r) => set(r));
+});
 
 function timestampKey(tableName) {
 	return `${tableName}_updated`;
@@ -104,6 +121,35 @@ export async function fetchRegions(ifMissing = true) {
 	await db.regions.bulkPut(stops);
 	updateCacheTimestamp('regions');
 	regionsLoaded.set(true);
+}
+
+export async function fetchOperators(fetcher = fetch, ifMissing = true) {
+	if (!browser) {
+		return;
+	}
+
+	let cacheInvalidated = true;
+	if (!ifMissing) {
+		await invalidateCacheTimestamp('operators');
+	} else {
+		cacheInvalidated = await isCacheInvalidated('operators');
+	}
+
+	if (!cacheInvalidated) {
+		const count = await db.operators.count();
+		console.log('Count', count);
+		if (count > 0 && ifMissing) {
+			operatorsLoaded.set(true);
+			return;
+		}
+	}
+
+	const response = await fetcher(`${apiServer}/v1/operators`);
+	const operators = await response.json();
+	await db.operators.clear();
+	await db.operators.bulkPut(operators);
+	updateCacheTimestamp('operators');
+	operatorsLoaded.set(true);
 }
 
 export async function fetchStops(ifMissing = true) {
@@ -240,6 +286,12 @@ export async function getRegions() {
 	return await db.regions.toArray();
 }
 
+export async function getOperators() {
+	const operators = await db.operators.toArray();
+	const operatorsObject = Object.fromEntries(operators.map((o) => [o.id, o]));
+	return operatorsObject;
+}
+
 export async function getStops() {
 	const stops = await db.stops.toArray();
 	const stopsObject = Object.fromEntries(stops.map((s) => [s.id, s]));
@@ -279,6 +331,10 @@ export async function patchStop(stop) {
 export async function loadMissing() {
 	const missing = [];
 
+	if (!_operatorsLoaded) {
+		missing.push(fetchOperators());
+	}
+
 	if (!_stopsLoaded) {
 		missing.push(fetchStops());
 	}
@@ -300,6 +356,7 @@ export async function loadMissing() {
 
 export async function wipeVolatileCachedData() {
 	await Promise.all([
+		db.operators.clear(),
 		db.stops.clear(),
 		db.routes.clear(),
 		// db.calendars.clear(),

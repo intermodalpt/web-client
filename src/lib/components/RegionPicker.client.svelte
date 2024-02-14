@@ -19,7 +19,7 @@
 	import { Map as Maplibre, NavigationControl, GeolocateControl } from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { liveQuery } from 'dexie';
-	import { fetchRegions, getRegions, regionId, setRegion, loadMissing } from '$lib/db';
+	import { fetchRegions, getRegions, regionsLoaded, setRegion } from '$lib/db';
 	import { tileStyle } from '$lib/settings.js';
 
 	let map;
@@ -29,7 +29,6 @@
 	let isGeolocating = false;
 
 	let mapLoaded = false;
-	let regionsLoaded = false;
 
 	let hoveredRegionId = null;
 	let explicitRegionChange = false;
@@ -47,15 +46,6 @@
 			return null;
 		}
 		return $regions.find((r) => r.id == $pendingRegionId);
-	});
-	const selectedRegion = derived([regions, regionId], ([$regions, $regionId]) => {
-		console.log('$regionId', $regionId);
-		if (!$regionId || !$regions) {
-			console.log('1');
-			return null;
-		}
-		console.log('2');
-		return $regions.find((r) => r.id == $regionId);
 	});
 
 	regions.subscribe((regs) => {
@@ -79,6 +69,7 @@
 		if (!mapLoaded || !$regions) {
 			return;
 		}
+
 		map.getSource('regions').setData({
 			type: 'FeatureCollection',
 			features: $regions.map((region) => ({
@@ -94,22 +85,10 @@
 	}
 
 	async function loadData() {
-		await Promise.all([
-			fetchRegions().then((r) => {
-				regionsLoaded = true;
-				drawRegions();
-				return r;
-			})
-			// fetch(`${apiServer}/v1/news&stuff`)
-			// 	.then((r) => r.json())
-			// 	.then((r) => {
-			// 		data = r;
-			// 	})
-		]);
+		await Promise.all([fetchRegions()]);
 	}
 	loadData().then(async () => {
-		console.log('data loaded');
-		await loadMissing();
+		console.log('Region picker data loaded');
 	});
 
 	const regionTabs = {
@@ -241,7 +220,7 @@
 			addSourcesAndLayers();
 			addEvents();
 			mapLoaded = true;
-			if (regionsLoaded) {
+			if ($regionsLoaded) {
 				drawRegions();
 			}
 		});
