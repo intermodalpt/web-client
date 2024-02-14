@@ -65,8 +65,7 @@
 		</div>
 		<p class="text-xl text-zinc-400">
 			Procuramos ser uma empresa responsável, que deixa um impacto positivo no mundo.<br />
-			Alem do comercial, fazemos o que acreditamos ser importante para a nossa comunidade.<br />
-			Assim demonstramos o valor do nosso trabalho.
+			Fazemos o que acreditamos ser importante para a nossa comunidade.
 		</p>
 	</div>
 </div>
