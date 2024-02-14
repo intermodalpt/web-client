@@ -1,4 +1,4 @@
-FROM node:lts-slim
+FROM node:slim
 
 COPY . /app
 RUN cd /app && npm install && npm run build
