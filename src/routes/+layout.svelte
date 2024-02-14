@@ -17,7 +17,8 @@
 	import { page } from '$app/stores';
 	import { selectedRegion } from '$lib/db';
 	import RegionPicker from '$lib/components/RegionPicker.client.svelte';
-	import globe from '$lib/images/globe.svg';
+	import globe from '$lib/icons/ui/globe.svg';
+	import logoText from '$lib/icons/logo-text.svg';
 	import '../app.css';
 
 	let regDialog;
@@ -62,7 +63,7 @@
 						</label>
 					</div>
 					<a class="btn btn-ghost hover:bg-zinc-100" href="/">
-						<img src="/logo-text.svg" class="h-8 max-w-[60vw]" alt="Início,Logotipo" />
+						<img src={logoText} class="h-8 max-w-[60vw]" alt="Início,Logotipo" />
 					</a>
 				</div>
 				<div class="navbar-end hidden lg:flex">

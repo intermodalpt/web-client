@@ -15,6 +15,19 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { fetchRegions, loadMissing } from '$lib/db';
+	import logo from '$lib/icons/logo.svg';
+	import swallow from '$lib/icons/swallow.svg';
+	import discourse from '$lib/icons/brands/discourse.svg';
+	import wpp from '$lib/icons/brands/wpp.svg';
+	import signal from '$lib/icons/brands/signal.svg';
+	import books from '$lib/icons/books.svg';
+	import lpp from '$lib/icons/brands/lpp.svg';
+	import osm from '$lib/icons/brands/osm.svg';
+	import gitlab from '$lib/icons/brands/gitlab.svg';
+	import github from '$lib/icons/brands/github.svg';
+	import mastodon from '$lib/icons/brands/mastodon.svg';
+	import instagram from '$lib/icons/brands/instagram.svg';
+	import facebook from '$lib/icons/brands/facebook.svg';
 
 	async function loadData() {
 		await Promise.all([
@@ -38,7 +51,7 @@
 
 <div
 	class="w-full pt-24 sm:pt-24 pb-[25vw] flex flex-col items-center gap-8"
-	style="background: url(/top.svg) top no-repeat, url(/footer.svg) bottom no-repeat; background-size: contain"
+	style="background: url(/backgrounds/top.svg) top no-repeat, url(/backgrounds/footer.svg) bottom no-repeat; background-size: contain"
 >
 	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0 lg:mt-4">
 		<div
@@ -64,7 +77,7 @@
 						href="https://editor.intermodal.pt"
 						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
 					>
-						<img src="/logo.svg" alt="Editor" class="w-24 h-24" />
+						<img src={logo} alt="Editor" class="w-24 h-24" />
 						<div>
 							<h2 class="font-bold">Editor</h2>
 							<p>
@@ -77,7 +90,7 @@
 						href="https://biblioteca.intermodal.pt"
 						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
 					>
-						<img src="/icons/books.svg" alt="Biblioteca" class="w-24 h-24" />
+						<img src={books} alt="Biblioteca" class="w-24 h-24" />
 						<div>
 							<h2 class="font-bold">Biblioteca</h2>
 							<p>
@@ -90,7 +103,7 @@
 						href="https://forum.intermodal.pt"
 						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
 					>
-						<img src="/icons/discourse.svg" alt="Forum" class="w-24" />
+						<img src={discourse} alt="Forum" class="w-24" />
 						<div>
 							<h2 class="font-bold">Forum</h2>
 							<p>
@@ -103,7 +116,7 @@
 						href="https://signal.me/#p/+351910551803"
 						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
 					>
-						<img src="/icons/signal.svg" alt="Signal" class="w-24" />
+						<img src={signal} alt="Signal" class="w-24" />
 						<div>
 							<h2 class="font-bold">Signal</h2>
 							<p>
@@ -116,7 +129,7 @@
 						href="https://wa.me/351910551803"
 						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
 					>
-						<img src="/icons/wpp.svg" alt="Whatsapp" class="w-24" />
+						<img src={wpp} alt="Whatsapp" class="w-24" />
 						<div>
 							<h2 class="font-bold">WhatsApp</h2>
 							<p>
@@ -128,23 +141,45 @@
 				</div>
 			</div>
 		</div>
-
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77]"
+			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
+				<h2 class="card-title">Já experimentou o Gira+?</h2>
+				<p>
+					O Gira+ é uma implementação comunitária da aplicação para as bicicletas partilhadas de
+					Lisboa. Foi feita por entusiastas.
+				</p>
 				<a
-					href="/andorinhas"
-					class="flex flex-col justify sm:justify-between sm:flex-row gap-3"
+					href="https://github.com/rt-evil-inc/gira"
+					target="_blank"
+					class="grid grid-cols-2 lg:grid-cols-4 gap-4"
 				>
+					<img src="/gira+/1.webp" alt="Ecrã do Gira+" class="rounded-xl" />
+					<img src="/gira+/2.webp" alt="Ecrã do Gira+" class="rounded-xl" />
+					<img src="/gira+/3.webp" alt="Ecrã do Gira+" class="rounded-xl" />
+					<img src="/gira+/4.webp" alt="Ecrã do Gira+" class="rounded-xl" />
+				</a>
+				<p>
+					Infelizmente está <a
+						class="link link-primary"
+						href="https://github.com/rt-evil-inc/gira/issues/2">em risco</a
+					>. Expresse à C.M. Lisboa que deveriam de ser mais abertos à comunidade.
+				</p>
+			</div>
+		</div>
+		<div
+			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
+			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
+		>
+			<div class="card-body">
+				<a href="/andorinhas" class="flex flex-col justify sm:justify-between sm:flex-row gap-3">
 					<div>
 						<h2 class="card-title">Junta-te ás andorinhas!</h2>
-						<p>
-							Ajuda-nos a migrar para o futuro.
-						</p>
+						<p>Ajuda-nos a migrar para o futuro.</p>
 					</div>
-					<img src="/swallow.svg" alt="Andorinha" class="h-32" />
+					<img src={swallow} alt="Andorinha" class="h-32" />
 				</a>
 			</div>
 		</div>
@@ -157,10 +192,10 @@
 				<h2 class="text-xs">Projetos amigos</h2>
 				<div class="flex gap-3 saturate-50">
 					<a href="https://www.openstreetmap.org/about">
-						<img src="/icons/osm.svg" class="w-10" alt="OpenStreetMap" />
+						<img src={osm} class="w-10" alt="OpenStreetMap" />
 					</a>
 					<button onclick="lpp_warning.showModal()">
-						<img src="/icons/lpp.svg" class="w-20" alt="Lisboa para Pessoas" />
+						<img src={lpp} class="w-20" alt="Lisboa para Pessoas" />
 					</button>
 				</div>
 			</div>
@@ -168,13 +203,13 @@
 				<h2 class="text-xs">Redes sociais</h2>
 				<div class="flex gap-3">
 					<a href="https://ciberlandia.pt/@intermodal">
-						<img src="/icons/mastodon.svg" class="w-10 drop-shadow-md" alt="Mastodon" />
+						<img src={mastodon} class="w-10 drop-shadow-md" alt="Mastodon" />
 					</a>
 					<button onclick="fb_warning.showModal()">
-						<img src="/icons/facebook.svg" class="w-10" alt="Facebook" />
+						<img src={facebook} class="w-10" alt="Facebook" />
 					</button>
 					<button onclick="ig_warning.showModal()">
-						<img src="/icons/instagram.svg" class="w-10 drop-shadow-md" alt="Instagram" />
+						<img src={instagram} class="w-10 drop-shadow-md" alt="Instagram" />
 					</button>
 				</div>
 			</div>
@@ -182,10 +217,10 @@
 				<h2 class="text-xs">A nossa formula secreta</h2>
 				<div class="flex gap-3">
 					<a href="https://gitlab.com/intermodalpt">
-						<img src="/icons/gitlab.svg" class="w-10" alt="Gitlab" />
+						<img src={gitlab} class="w-10" alt="Gitlab" />
 					</a>
 					<a href="https://github.com/intermodalpt">
-						<img src="/icons/github.svg" class="w-10" alt="Github" />
+						<img src={github} class="w-10" alt="Github" />
 					</a>
 				</div>
 			</div>

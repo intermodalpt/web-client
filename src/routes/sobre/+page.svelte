@@ -14,8 +14,27 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
+<script>
+	import logoText from '$lib/icons/logo-text.svg';
+	import child from '$lib/icons/openmoji/child.svg';
+	import woman from '$lib/icons/openmoji/woman.svg';
+	import elderly from '$lib/icons/openmoji/elderly.svg';
+	import afrodesc from '$lib/icons/openmoji/afro-desc.svg';
+	import deaf from '$lib/icons/openmoji/deaf.svg';
+	import wheelchair from '$lib/icons/openmoji/wheelchair.svg';
+	import blind from '$lib/icons/openmoji/blind.svg';
+	import guidedog from '$lib/icons/openmoji/guidedog.svg';
+	import codeImg from './illustrations/code.webp';
+	import osmCompare from './illustrations/osmcompare.webp';
+	import survey from './illustrations/survey.webp';
+	import bar from './muns/bar.svg';
+	import ses from './muns/ses.svg';
+	import tml from './partners/tml.svg';
+	import cmet from './partners/cmet.svg';
+</script>
+
 <div class="brand-slide flex flex-col min-h-screen items-center justify-center">
-	<img src="/logo-text.svg" alt="Intermodal" class="w-[40rem] px-2" />
+	<img src={logoText} alt="Intermodal" class="w-[40rem] px-2" />
 	<p class="text-xl sm:text-2xl font-extralight">
 		Uma marca para um futuro móvel, sustentável e aberto
 	</p>
@@ -29,7 +48,7 @@
 		</p>
 		<div class="flex flex-col py-24">
 			<span class="text-xl self-center text-zinc-400">Palavras chave</span>
-			<ul class="flex flex-wrap gap-y-8 gap-x-32 text-3xl py-6 justify-around ">
+			<ul class="flex flex-wrap gap-y-8 gap-x-32 text-3xl py-6 justify-around">
 				<li>Mobilidade</li>
 				<li>Transportes</li>
 				<li>Espaço público</li>
@@ -56,10 +75,10 @@
 </div>
 <div class="w-full flex justify-center drop-shadow-lg z-10">
 	<div class="w-full grid grid-cols-1 2xl:grid-cols-2">
-		<div class="bg-[#dd7878] text-[#f2cdcd] p-2 sm:p-4 lg:p-16  saturate-[0.9]">
+		<div class="bg-[#dd7878] text-[#f2cdcd] p-2 sm:p-4 lg:p-16 saturate-[0.9]">
 			<h1 class="text-3xl drop-shadow-xl">Levantamento e processamento de dados</h1>
 			<div class="flex flex-col-reverse lg:flex-row gap-4">
-				<img src="survey.webp" alt="Levantamento de dados" class="h-fit lg:h-48 rounded-lg" />
+				<img src={survey} alt="Levantamento de dados" class="h-fit lg:h-48 rounded-lg" />
 				<div>
 					<p>
 						Perante a falta de dados de qualidade tomamos a missão por nossa!<br />
@@ -74,7 +93,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="bg-[#04a5e5] text-[#89dceb] p-2 sm:p-4 lg:p-16 shadow-md  saturate-[0.75]">
+		<div class="bg-[#04a5e5] text-[#89dceb] p-2 sm:p-4 lg:p-16 shadow-md saturate-[0.75]">
 			<h1 class="text-3xl text-white">Desenvolvimento de sistemas</h1>
 			<div class="flex flex-col lg:flex-row gap-4 justify-between">
 				<div>
@@ -89,7 +108,7 @@
 						na manga!
 					</p>
 				</div>
-				<img src="code.webp" alt="Programação" class="h-fit lg:h-48 rounded-lg shrink-0" />
+				<img src={codeImg} alt="Programação" class="h-fit lg:h-48 rounded-lg shrink-0" />
 			</div>
 		</div>
 		<div class="bg-[#179299] text-[#94e2d5] p-2 sm:p-4 lg:p-16 shadow-md saturate-50">
@@ -97,10 +116,14 @@
 			<div class="flex flex-col items-start">
 				<p>
 					Participamos no projeto <a href="https://openstreetmap.org"><b>OpenStreetMap</b></a>: Um
-					mapa livre, ideal para serviços públicos, investigação, empresas competitivas e a criação de
-					soluções inovadoras que ilustram o território português.
+					mapa livre, ideal para serviços públicos, investigação, empresas competitivas e a criação
+					de soluções inovadoras que ilustram o território português.
 				</p>
-				<img src="osmcompare.webp" alt="Comparação entre OSM e satélite" class="max-h-48 w-auto rounded-lg shrink-0" />
+				<img
+					src={osmCompare}
+					alt="Comparação entre OSM e satélite"
+					class="max-h-48 w-auto rounded-lg shrink-0"
+				/>
 			</div>
 		</div>
 		<div class="bg-[#df8e1d] text-[#f9e2af] p-2 sm:p-4 lg:p-16 shadow-md saturate-50">
@@ -114,16 +137,16 @@
 				incapacidade de deslocação.
 			</p>
 			<div class="flex flex-wrap">
-				<figure><img src="/icons/child.svg" class="w-16 lg:w-24" alt="Criança" /></figure>
-				<figure><img src="/icons/woman.svg" class="w-16 lg:w-24" alt="Mulher" /></figure>
-				<figure><img src="/icons/elderly.svg" class="w-16 lg:w-24" alt="Idoso" /></figure>
+				<figure><img src={child} class="w-16 lg:w-24" alt="Criança" /></figure>
+				<figure><img src={woman} class="w-16 lg:w-24" alt="Mulher" /></figure>
+				<figure><img src={elderly} class="w-16 lg:w-24" alt="Idoso" /></figure>
 				<figure>
-					<img src="/icons/afro-desc.svg" class="w-16 lg:w-24" alt="Afro-descentente" />
+					<img src={afrodesc} class="w-16 lg:w-24" alt="Afro-descentente" />
 				</figure>
-				<figure><img src="/icons/deaf.svg" class="w-16 lg:w-24" alt="Surdo" /></figure>
-				<figure><img src="/icons/wheelchair.svg" class="w-16 lg:w-24" alt="Cadeirante" /></figure>
-				<figure><img src="/icons/blind.svg" class="w-16 lg:w-24" alt="Cego" /></figure>
-				<figure><img src="/icons/guidedog.svg" class="w-16 lg:w-24" alt="Cão Guia" /></figure>
+				<figure><img src={deaf} class="w-16 lg:w-24" alt="Surdo" /></figure>
+				<figure><img src={wheelchair} class="w-16 lg:w-24" alt="Cadeirante" /></figure>
+				<figure><img src={blind} class="w-16 lg:w-24" alt="Cego" /></figure>
+				<figure><img src={guidedog} class="w-16 lg:w-24" alt="Cão Guia" /></figure>
 			</div>
 			<span class="absolute bottom-0 right-2 text-xs opacity-75"
 				>OpenMoji icons <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA</a></span
@@ -136,7 +159,7 @@
 		<div class="w-[100em] mx-4 flex flex-col gap-8 relative overflow-hidden">
 			<h1 class="text-5xl mt-32">Equipa</h1>
 			<div>
-				<div class="lg:w-fit carousel carousel-center space-x-4 rounded-box ">
+				<div class="lg:w-fit carousel carousel-center space-x-4 rounded-box">
 					<div class="carousel-item">
 						<div class="card w-64 xl:w-72 bg-base-100 border-2">
 							<div class="absolute h-20 bg-red-600 w-full" />
@@ -156,14 +179,14 @@
 						</div>
 					</div>
 					<div class="carousel-item">
-						<div class="card w-64 xl:w-72 bg-base-100  border-2">
+						<div class="card w-64 xl:w-72 bg-base-100 border-2">
 							<div class="absolute h-20 bg-lime-500 w-full" />
 							<div class="card-body">
 								<div class="avatar">
 									<div
 										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
 									>
-										<!-- <img src="/avatars/none.png" alt="João Bebiano" /> -->
+										<img src="/avatars/theo.webp" alt="João Bebiano" />
 									</div>
 								</div>
 								<div>
@@ -179,9 +202,27 @@
 							<div class="card-body">
 								<div class="avatar">
 									<div
+										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
+									>
+										<img src="/avatars/maf.webp" alt="Mafalda Antunes" />
+									</div>
+								</div>
+								<div>
+									<h2 class="card-title">Mafalda Antunes</h2>
+									<span class="text-sm">Assistência, Sustentabilidade</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="carousel-item">
+						<div class="card w-64 xl:w-72 bg-base-100 border-2">
+							<div class="absolute h-20 bg-zinc-500 w-full" />
+							<div class="card-body">
+								<div class="avatar">
+									<div
 										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2"
 									>
-										<img src="/avatars/telles.webp" alt="Tiago Teles" />
+										<img src="/avatars/teles.webp" alt="Tiago Teles" />
 									</div>
 								</div>
 								<div>
@@ -216,16 +257,16 @@
 		<div>
 			<h1 class="text-3xl lg:text-5xl mb-8">Os nossos clientes</h1>
 			<div class="flex flex-wrap gap-16 shrink-0">
-				<img src="LogoTML.svg" alt="Transportes Metropolitanos de Lisboa" class="h-16 lg:h-24" />
-				<img src="LogoCmet.svg" alt="Carris Metropolitana" class="h-16 lg:h-24" />
+				<img src={tml} alt="Transportes Metropolitanos de Lisboa" class="h-16 lg:h-24" />
+				<img src={cmet} alt="Carris Metropolitana" class="h-16 lg:h-24" />
 			</div>
 		</div>
-		<span class="divider divider-horizontal hidden " />
+		<span class="divider divider-horizontal hidden" />
 		<div>
 			<h1 class="text-3xl lg:text-5xl mb-8">Autarquias cartografadas</h1>
 			<div class="flex flex-wrap gap-16">
-				<img src="muns/bar.svg" alt="Barreiro" class="w-48 lg:w-64" />
-				<img src="muns/ses.svg" alt="Sesimbra" class="w-48 lg:w-64" />
+				<img src={bar} alt="Barreiro" class="w-48 lg:w-64" />
+				<img src={ses} alt="Sesimbra" class="w-48 lg:w-64" />
 			</div>
 		</div>
 	</div>
@@ -240,50 +281,50 @@
 		<ul class="flex flex-wrap shrink-0 gap-4 saturate-50">
 			<li>
 				<a href="https://www.rust-lang.org">
-					<img src="programing/rust.svg" alt="Rust" class="h-16" />
+					<img src="foss/rust.svg" alt="Rust" class="h-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://svelte.dev">
-					<img src="programing/svelte.svg" alt="Svelte" class="h-16" />
+					<img src="foss/svelte.svg" alt="Svelte" class="h-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://www.python.org">
-					<img src="programing/python.svg" alt="Python" class="h-16" />
+					<img src="foss/python.svg" alt="Python" class="h-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://qgis.org">
-					<img src="programing/qgis.svg" alt="QGIS" class="h-16" />
+					<img src="foss/qgis.svg" alt="QGIS" class="h-16" />
 				</a>
 			</li>
-			<li><img src="programing/linux.svg" alt="Linux" class="h-16" /></li>
+			<li><img src="foss/linux.svg" alt="Linux" class="h-16" /></li>
 			<li>
 				<a href="https://opencv.org">
-					<img src="programing/opencv.svg" alt="OpenCV" class="h-16" />
+					<img src="foss/opencv.svg" alt="OpenCV" class="h-16" />
 				</a>
 			</li>
 		</ul>
 		<ul class="flex flex-wrap shrink-0 gap-4 saturate-50 mt-2">
 			<li>
 				<a href="https://www.blender.org/">
-					<img src="programing/blender.svg" alt="Blender" class="h-16" />
+					<img src="foss/blender.svg" alt="Blender" class="h-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://inkscape.org/">
-					<img src="programing/inkscape.svg" alt="Inkscape" class="w-16" />
+					<img src="foss/inkscape.svg" alt="Inkscape" class="w-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://opentoonz.github.io">
-					<img src="programing/opentoonz.svg" alt="OpenToonz" class="w-16" />
+					<img src="foss/opentoonz.svg" alt="OpenToonz" class="w-16" />
 				</a>
 			</li>
 			<li>
 				<a href="https://krita.org">
-					<img src="programing/krita.svg" alt="Krita" class="w-16" />
+					<img src="foss/krita.svg" alt="Krita" class="w-16" />
 				</a>
 			</li>
 		</ul>
@@ -303,6 +344,7 @@
 <style>
 	.brand-slide {
 		min-height: 100vh;
+		background-image: url(/stock/mads-schmidt-rasmussen-6YmzwamGzCg.jpg);
 		background-size: cover;
 		background-position: center;
 		background-attachment: fixed;
@@ -316,7 +358,7 @@
 		width: 100%;
 		height: 100%;
 		background-color: white;
-		background-image: url('/bg-attempt.svg');
+		background-image: url('/backgrounds/team.svg');
 		background-repeat: no-repeat;
 		background-position: center;
 		background-size: cover;

@@ -14,7 +14,19 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
+	import { operatorsWithIcons, operatorsWithMinIcons } from '$lib/settings.js';
+
 	export let operator;
 </script>
 
-<div class="company compact {operator.tag} bg-base-200 hidden sm:block" />
+<div class="w-full flex flex-col sm:flex-row gap-4">
+	{#if operatorsWithIcons.has(operator.id)}
+		<img
+			class="h-full max-w-16"
+			src="/operators/{operator.tag}/logo{operatorsWithMinIcons.has(operator.id) ? '-min' : ''}.svg"
+		/>
+	{/if}
+	<div class="flex justify">
+		<span class="text-2xl font-bold">{operator.name}</span>
+	</div>
+</div>

@@ -15,22 +15,14 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { operators } from '$lib/stores.js';
+	import { operatorsWithIcons, operatorsWithMinIcons } from '$lib/settings.js';
+	import infoIcon from '$lib/icons/ui/info.svg';
+	import routeIcon from '$lib/icons/ui/route.svg';
+	import timeIcon from '$lib/icons/ui/time.svg';
 
 	export let onEnter, onUnfocus, onFocus, onLeave, gotoRoute, gotoInfo, gotoSchedule;
 	export let route;
 	let open = false;
-
-	const minifiedLogos = {
-		1: 'cmet-min',
-		2: 'tcb',
-		3: 'carris-min',
-		4: 'mobic-min',
-		5: 'cp-min',
-		6: 'fertagus-min',
-		7: 'mts-min',
-		8: 'ml',
-		9: 'ttsl'
-	};
 </script>
 
 <div
@@ -45,19 +37,29 @@
 	}}
 >
 	<div
-		class="cursor-pointer flex flex-row items-center p-1 gap-1 sm:gap-2  bg-base-100 hover:bg-base-300 rounded-full"
+		class="cursor-pointer flex flex-row items-center p-1 gap-1 sm:gap-2 bg-base-100 hover:bg-base-300 rounded-full"
 		on:mouseenter={() => onEnter(route.id)}
 		on:mouseleave={() => onLeave(route.id)}
 	>
 		<div
-			class="flex flex-row items-center rounded-full  border-base-content shrink-0 bg-base-100"
+			class="flex flex-row items-center rounded-full border-base-content shrink-0 bg-base-100"
 			style:border="2px solid {route.badge_text}"
 		>
-			<img
-				class="ml-1 w-7 px-[2px]"
-				src="/logos/{minifiedLogos[route.operator]}.svg"
-				alt={operators[route.operator].name}
-			/>
+			{#if operatorsWithIcons.has(route.operator)}
+				{#if operatorsWithMinIcons.has(route.operator)}
+					<img
+						class="ml-1 w-7 px-[2px]"
+						src="/operators/{operators[route.operator]?.tag}/logo-min.svg"
+						alt={operators[route.operator]?.name}
+					/>
+				{:else}
+					<img
+						class="ml-1 w-7 px-[2px]"
+						src="/operators/{operators[route.operator]?.tag}/logo.svg"
+						alt={operators[route.operator]?.name}
+					/>
+				{/if}
+			{/if}
 			<div
 				class="rounded-full px-2 py-1 -my-[2px] -mr-[2px] text-lg"
 				style:background-color={route.badge_bg}
@@ -83,7 +85,7 @@
 				on:click={() => gotoRoute(route.id)}
 				on:keypress={() => gotoRoute(route.id)}
 			>
-				<img class="w-10" src="/icons/route.svg" alt="Percurso" />
+				<img class="w-10" src={routeIcon} alt="Percurso" />
 				<span class="text-lg">Percurso</span>
 			</div>
 			<div
@@ -91,7 +93,7 @@
 				on:click={() => gotoSchedule(route.id)}
 				on:keypress={() => gotoSchedule(route.id)}
 			>
-				<img class="w-10" src="/icons/time.svg" alt="Horário" />
+				<img class="w-10" src={timeIcon} alt="Horário" />
 				<span class="text-lg">Horário</span>
 			</div>
 			<div
@@ -99,7 +101,7 @@
 				on:click={() => gotoInfo(route.id)}
 				on:keypress={() => gotoInfo(route.id)}
 			>
-				<img class="w-10" src="/icons/info.svg" alt="Informação" />
+				<img class="w-10" src={infoIcon} alt="Informação" />
 				<span class="text-lg">Informação</span>
 			</div>
 		</div>
