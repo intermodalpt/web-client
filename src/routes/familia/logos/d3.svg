@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- generated at drububu.com  -->
+
+<svg
+   version="1.1"
+   preserveAspectRatio="xMinYMin meet"
+   x="0px"
+   y="0px"
+   width="21.166666mm"
+   height="21.166666mm"
+   viewBox="0 0 74.999998 74.999997"
+   id="svg4492"
+   inkscape:version="1.3.2 (091e20ef0f, 2023-11-25)"
+   sodipodi:docname="icone-d3_fundo-verde_letras-recortadas.svg"
+   inkscape:export-filename="/home/ana/Repos/manufactura/d3-imagem/logo/exports PNG/logo-d3_fundo-verde_letras-recortadas_80x390px.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <metadata
+     id="metadata4808">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs4806" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1163"
+     id="namedview4804"
+     showgrid="true"
+     units="mm"
+     inkscape:zoom="1.7743935"
+     inkscape:cx="-8.1718065"
+     inkscape:cy="35.786877"
+     inkscape:window-x="0"
+     inkscape:window-y="960"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg4492"
+     inkscape:object-nodes="true"
+     inkscape:snap-page="false"
+     inkscape:snap-bbox="true"
+     inkscape:bbox-nodes="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:showpageshadow="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm">
+    <inkscape:grid
+       type="xygrid"
+       id="grid4234"
+       originx="-65.624996"
+       originy="-614.06249"
+       spacingy="1"
+       spacingx="1"
+       units="mm"
+       visible="true" />
+  </sodipodi:namedview>
+  <rect
+     style="fill:#424242;stroke-width:0.531496;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke;fill-opacity:1"
+     id="rect1"
+     width="75"
+     height="75"
+     x="0"
+     y="0" />
+  <path
+     style="fill:#60f163;fill-opacity:1;stroke-width:1.0666666"
+     d="m 0,0 v 80 h 75 v -5 h 5 V 0 Z m 55,10 h 10 v 5 h 5 v 5 h -5 v 5 h 5 v 5 h -5 v 5 H 55 V 30 H 65 V 25 H 55 V 20 H 65 V 15 H 55 Z m -40,5 h 25 v 5 h 5 v 5 h 5 v 30 h -5 v 5 h -5 v 5 H 15 Z m 10,5 v 40 h 10 v -5 h 5 V 25 h -5 v -5 z"
+     transform="scale(0.93750001)"
+     id="path4920"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="cccccccccccccccccccccccccccccccccccccccccccccccccc"
+     inkscape:export-filename="/home/ana/Repos/manufactura/d3-imagem/logo/exports PNG/icone-d3_16x16px.png"
+     inkscape:export-xdpi="19.200001"
+     inkscape:export-ydpi="19.200001" />
+</svg>
