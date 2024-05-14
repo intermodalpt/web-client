@@ -30,11 +30,39 @@
 	}
 </script>
 
+<svelte:head>
+	<title>{'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}</title>
+	<meta name="title" content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'} />
+	<meta
+		property="og:title"
+		content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}
+	/>
+	<meta
+		property="twitter:title"
+		content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}
+	/>
+	<meta
+		name="description"
+		content={$page.data.description ??
+			'A plataforma para a mobilidade. Informação na palma da mão.'}
+	/>
+	<meta
+		property="og:description"
+		content={$page.data.description ??
+			'A plataforma para a mobilidade. Informação na palma da mão.'}
+	/>
+	<meta
+		property="twitter:description"
+		content={$page.data.description ??
+			'A plataforma para a mobilidade. Informação na palma da mão.'}
+	/>
+</svelte:head>
+
 <div class="drawer grow">
 	<input id="drawer" type="checkbox" class="drawer-toggle" />
 	<div class="drawer-content flex flex-col">
 		<div
-			class="w-[min(960px,100%)] mx-auto p-0 sm:p-2 pb-4 lg:px-0 xl:pt-4 self-center"
+			class="w-[min(960px,100%)] mx-auto p-0 pb-4 lg:px-0 xl:pt-4 self-center"
 			class:absolute={$page.data.floatingMenu || false}
 			class:top-0={$page.data.floatingMenu || false}
 			class:z-[3000]={$page.data.floatingMenu || false}
