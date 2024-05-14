@@ -23,6 +23,8 @@ export const prerender = false;
 /** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
     return {
+        title: 'Sobre',
+        description: 'O Intermodal quer ser uma marca de soluções para a mobilidade. Descrobre quem somos e o que fazemos',
         floatingMenu: true,
     }
 }

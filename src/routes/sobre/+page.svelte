@@ -47,20 +47,17 @@
 			vivemos e nelas investimos com as nossas inovações.
 		</p>
 		<div class="flex flex-col py-24">
-			<span class="text-xl self-center text-zinc-400">Palavras chave</span>
+			<span class="text-xl self-center text-zinc-400">Palavras-chave</span>
 			<ul class="flex flex-wrap gap-y-8 gap-x-32 text-3xl py-6 justify-around">
 				<li>Mobilidade</li>
-				<li>Transportes</li>
 				<li>Espaço público</li>
 				<li>Acessibilidade</li>
 				<li>Inclusividade</li>
 				<li>Cartografia</li>
-				<li>Dados</li>
-				<li>Analise</li>
+				<li>Análise</li>
 				<li>Visualização</li>
-				<li>Fonte aberta</li>
-				<li>Acesso livre</li>
-				<li>Responsibilidade social</li>
+				<li>Educação</li>
+				<li>Direitos digitais</li>
 			</ul>
 		</div>
 		<p class="text-xl text-zinc-400">
@@ -69,7 +66,7 @@
 		</p>
 	</div>
 </div>
-<div class="w-full flex gap-8 justify-center py-8 shadow-inner">
+<div class="w-full flex gap-8 justify-center py-8 bg-white shadow-inner">
 	<h2 class="text-5xl self-center text-zinc-800">O que fazemos</h2>
 </div>
 <div class="w-full flex justify-center drop-shadow-lg z-10">
@@ -102,7 +99,7 @@
 						soluções de baixo custo <b>sem compromissos</b>.
 					</p>
 					<p>
-						Muito do que fazemos é públicado como <b>software livre</b>, para que possa ser usado,
+						Muito do que fazemos é publicado como <b>software livre</b>, para que possa ser usado,
 						melhorado e estudado por <b>todos</b>. Sem práticas abusivas, sem segredos, sem truques
 						na manga!
 					</p>
@@ -155,79 +152,59 @@
 </div>
 <div class="relative bg-white">
 	<div class="team-slide-inner flex justify-center">
-		<div class="w-[100em] mx-4 flex flex-col gap-8 relative overflow-hidden">
-			<h1 class="text-5xl mt-32">Equipa</h1>
-			<div>
-				<div class="lg:w-fit carousel carousel-center space-x-4 rounded-box">
-					<div class="carousel-item">
-						<div class="card w-64 xl:w-72 bg-base-100 border-2">
-							<div class="absolute h-20 bg-red-600 w-full" />
-							<div class="card-body">
-								<div class="avatar">
-									<div
-										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2"
-									>
-										<img src="/avatars/claudio.webp" alt="Cláudio Pereira" />
-									</div>
+		<div class="mx-4 flex flex-col gap-8 relative" style="width: calc(min(100%,100em));">
+			<h1 class="text-5xl mt-20">Equipa</h1>
+			<div class="w-full carousel carousel-center space-x-4 rounded-box overflow-auto">
+				<div class="carousel-item">
+					<div class="card w-64 xl:w-72 bg-base-100 border-2">
+						<div class="absolute h-20 bg-red-600 w-full rounded-t-xl" />
+						<div class="card-body">
+							<div class="avatar">
+								<div
+									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2"
+								>
+									<img src="/avatars/claudio.webp" alt="Cláudio Pereira" />
 								</div>
-								<div>
-									<span class="card-title">Cláudio Pereira</span>
-									<span class="text-sm">Criador de ideias</span>
-								</div>
+							</div>
+							<div>
+								<span class="card-title">Cláudio Pereira</span>
+								<span class="text-sm">Criador de ideias</span>
 							</div>
 						</div>
 					</div>
-					<div class="carousel-item">
-						<div class="card w-64 xl:w-72 bg-base-100 border-2">
-							<div class="absolute h-20 bg-lime-500 w-full" />
-							<div class="card-body">
-								<div class="avatar">
-									<div
-										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
-									>
-										<img src="/avatars/theo.webp" alt="João Bebiano" />
-									</div>
+				</div>
+				<div class="carousel-item">
+					<div class="card w-64 xl:w-72 bg-base-100 border-2">
+						<div class="absolute h-20 bg-lime-500 w-full rounded-t-xl" />
+						<div class="card-body">
+							<div class="avatar">
+								<div
+									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
+								>
+									<img src="/avatars/theo.webp" alt="João Bebiano" />
 								</div>
-								<div>
-									<span class="card-title">João Bebiano</span>
-									<span class="text-sm">Matemático, Cartografo</span>
-								</div>
+							</div>
+							<div>
+								<span class="card-title">João Bebiano</span>
+								<span class="text-sm">Matemático, Cartografo</span>
 							</div>
 						</div>
 					</div>
-					<div class="carousel-item">
-						<div class="card w-64 xl:w-72 bg-base-100 border-2">
-							<div class="absolute h-20 bg-sky-500 w-full" />
-							<div class="card-body">
-								<div class="avatar">
-									<div
-										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
-									>
-										<img src="/avatars/maf.webp" alt="Mafalda Antunes" />
-									</div>
-								</div>
-								<div>
-									<h2 class="card-title">Mafalda Antunes</h2>
-									<span class="text-sm">Assistência, Sustentabilidade</span>
+				</div>
+				<div class="carousel-item">
+					<div class="card w-64 xl:w-72 bg-base-100 border-2">
+						<div class="absolute h-20 bg-sky-500 w-full rounded-t-xl" />
+						<div class="card-body">
+							<div class="avatar">
+								<div
+									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
+								>
+									<img src="/avatars/maf.webp" alt="Mafalda Antunes" />
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="carousel-item">
-						<div class="card w-64 xl:w-72 bg-base-100 border-2">
-							<div class="absolute h-20 bg-zinc-500 w-full" />
-							<div class="card-body">
-								<div class="avatar">
-									<div
-										class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2"
-									>
-										<img src="/avatars/teles.webp" alt="Tiago Teles" />
-									</div>
-								</div>
-								<div>
-									<h2 class="card-title">Tiago Teles</h2>
-									<span class="text-sm">Programador, Designer</span>
-								</div>
+							<div>
+								<h2 class="card-title">Mafalda Antunes</h2>
+								<span class="text-sm">Dados, Sustentabilidade</span>
 							</div>
 						</div>
 					</div>
@@ -239,6 +216,7 @@
 				<div class="card-body">
 					<h2 class="card-title">Contributos</h2>
 					<ul class="flex flex-wrap gap-x-4 gap-y-2">
+						<li>Tiago Teles</li>
 						<li>Diogo Baptista</li>
 						<li>Diogo Martins</li>
 						<li>Henrique Pereira</li>
