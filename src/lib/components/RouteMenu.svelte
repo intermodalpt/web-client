@@ -16,34 +16,30 @@
 <script>
 	import { page } from '$app/stores';
 
+	export let regionId;
 	export let operatorTag;
 	export let route;
 </script>
 
-<div class="tabs mx-auto w-full mb-4">
+<div role="tablist" class="tabs tabs-bordered mx-auto mb-4">
 	<a
-		href="/servicos/{operatorTag}/{route.id}/informacao"
-		class={`tab tab-lg tab-bordered`}
+		href="/regiao/{regionId}/{operatorTag}/{route.id}/informacao"
+		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('informacao')}>Informação</a
 	>
 	<a
-		href="/servicos/{operatorTag}/{route.id}/horario"
-		class={`tab tab-lg tab-bordered`}
+		href="/regiao/{regionId}/{operatorTag}/{route.id}/horario"
+		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('horario')}>Horário</a
 	>
 	<a
-		href="/servicos/{operatorTag}/{route.id}/percurso"
-		class={`tab tab-lg tab-bordered`}
+		href="/regiao/{regionId}/{operatorTag}/{route.id}/percurso"
+		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('percurso')}>Percurso</a
 	>
 	<a
-		href="/servicos/{operatorTag}/{route.id}/paragens"
-		class={`tab tab-lg tab-bordered`}
+		href="/regiao/{regionId}/{operatorTag}/{route.id}/paragens"
+		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('paragens')}>Paragens</a
-	>
-	<a
-		href="/servicos/{operatorTag}/{route.id}/assistencia"
-		class={`tab tab-lg tab-bordered`}
-		class:tab-active={$page.url.pathname.endsWith('assistencia')}>Assistência</a
 	>
 </div>
