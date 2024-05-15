@@ -50,24 +50,104 @@
 </svelte:head>
 
 <div
-	class="w-full pt-24 sm:pt-24 pb-[25vw] flex flex-col items-center gap-8"
+	class="w-full pt-20 lg:pt-24 pb-[25vw] flex flex-col items-center gap-8"
 	style="background: url(/backgrounds/top.svg) top no-repeat, url(/backgrounds/footer.svg) bottom no-repeat; background-size: contain"
 >
-	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0 lg:mt-4">
+	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0 lg:mt-2">
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
+			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
 				<h2 class="card-title">🚧 Obras adiante 🚧</h2>
 				<p>
-					Estamos a melhorar o Intermodal para suportar o país. Durante as próximas semanas a
-					plataforma poderá não funcionar. Pedimos desculpa.
+					Esta plataforma não é um produto finalizado. Explore à vontade e partilhe as suas
+					opiniões.
 				</p>
+				<div class="flex gap-2 justify-end">
+					<a class="btn btn-primary" href="/plano">Ver plano</a>
+				</div>
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
+			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
+		>
+			<div class="card-body">
+				<h2 class="card-title">O que é o Intermodal?</h2>
+				<div class="flex flex-col gap-4">
+					<span class="flex flex-col sm:flex-row gap-3 p-4">
+						<img src={person} alt="Pessoa" class="w-24 h-24" />
+						<div>
+							<h2 class="font-bold">Para si</h2>
+							<p>
+								Queremos popularizar a <b>mobilidade sustentável</b>🚶 🚴 🚌 🚆, faze-la
+								<b>apelativa</b> 😊, <b>inclusiva</b> 👴 e <b>superior</b> 🚀.
+							</p>
+							<p>
+								Melhoramos os serviços existentes, facilitamos a consulta e criamos material
+								educativo.
+							</p>
+							<p>Por um <b>futuro</b> com uma <b>sociedade saudável e verde</b> ❤️🌱!</p>
+						</div>
+					</span>
+					<div class="flex flex-col sm:flex-row gap-2 justify-end">
+						<a class="btn btn-primary" href="/sobre">Saber mais</a>
+						<!-- <a class="btn btn-primary" href="/sobre/operadores-e-instituicoes"
+							>Para operadores e instituições</a
+						> -->
+					</div>
+				</div>
+			</div>
+		</div>
+		<div
+			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
+		>
+			<div class="card-body">
+				<div class="flex flex-wrap justify-between sm:grid sm:grid-cols-2 gap-2">
+					<a
+						href="/agenda"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+					>
+						<img src={calendar} alt="Agenda" class="w-24" />
+						<div>
+							<h2 class="font-bold">Agenda</h2>
+							<p>Por esse país fora.</p>
+						</div>
+					</a>
+					<a href="/lab" class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg">
+						<img src={lab} alt="Laboratório" class="w-24" />
+						<div>
+							<h2 class="font-bold">Laboratório</h2>
+							<p>A nossa incubadora de ideias.</p>
+						</div>
+					</a>
+					<a
+						href="/iniciativas"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+					>
+						<img src={knot} alt="Lasso" class="w-24" />
+						<div>
+							<h2 class="font-bold">Iniciativas</h2>
+							<p>Por matérias relacionadas.</p>
+						</div>
+					</a>
+					<a
+						href="/familia"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+					>
+						<img src={hearthands} alt="Mãos em coração" class="w-24" />
+						<div>
+							<h2 class="font-bold">Familia de projetos</h2>
+							<p>Descobre causas como a nossa.</p>
+						</div>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div
+			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -142,35 +222,7 @@
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
-			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
-		>
-			<div class="card-body">
-				<h2 class="card-title">Já experimentou o Gira+?</h2>
-				<p>
-					O Gira+ é uma implementação comunitária da aplicação para as bicicletas partilhadas de
-					Lisboa. Foi feita por entusiastas.
-				</p>
-				<a
-					href="https://github.com/rt-evil-inc/gira"
-					target="_blank"
-					class="grid grid-cols-2 lg:grid-cols-4 gap-4"
-				>
-					<img src="/gira+/1.webp" alt="Ecrã do Gira+" class="rounded-xl" />
-					<img src="/gira+/2.webp" alt="Ecrã do Gira+" class="rounded-xl" />
-					<img src="/gira+/3.webp" alt="Ecrã do Gira+" class="rounded-xl" />
-					<img src="/gira+/4.webp" alt="Ecrã do Gira+" class="rounded-xl" />
-				</a>
-				<p>
-					Infelizmente está <a
-						class="link link-primary"
-						href="https://github.com/rt-evil-inc/gira/issues/2">em risco</a
-					>. Expresse à C.M. Lisboa que deveriam de ser mais abertos à comunidade.
-				</p>
-			</div>
-		</div>
-		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] mx-2 lg:mx-0"
+			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
