@@ -37,6 +37,7 @@ export async function load({ params, fetch }) {
 		const regionOperators = Object.values(operators).filter((op) => op.regions.includes(regionId));
 
 		return {
+			title: `Região de ${region.name}`,
 			region: region,
 			operators: regionOperators
 		};
@@ -54,6 +55,7 @@ export async function load({ params, fetch }) {
 		const regionData = await res.json();
 
 		return {
+			title: `Região de ${regionData.name}`,
 			region: regionData,
 			operators: regionData.operators
 		};
