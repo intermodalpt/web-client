@@ -101,5 +101,15 @@
 				>em risco</a
 			>. Expresse à C.M. Lisboa que deveriam de ser mais abertos à comunidade.
 		</p>
+		<hr class="my-4" />
+		<h2 class="text-3xl font-bold">Caixa da Comunidade</h2>
+		<p>
+			Somos seres sociais. Criamos socialmente, desfrutamos socialmente. Mas e quando não temos a
+			pessoa certa à mão? Partilhamos algumas das nossas pessoas certas. Pode ser que te sejam
+			úteis.
+		</p>
+		<div class="flex justify-end">
+			<a href="/iniciativas/caixa-da-comunidade" class="btn btn-primary">Abrir</a>
+		</div>
 	</div>
 </div>
