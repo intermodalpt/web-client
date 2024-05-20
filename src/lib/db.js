@@ -286,10 +286,18 @@ export async function getRegions() {
 	return await db.regions.toArray();
 }
 
+export async function getRegion(id) {
+	return await db.regions.get(id);
+}
+
 export async function getOperators() {
 	const operators = await db.operators.toArray();
 	const operatorsObject = Object.fromEntries(operators.map((o) => [o.id, o]));
 	return operatorsObject;
+}
+
+export async function getOperator(id) {
+	return await db.operators.get(id);
 }
 
 export async function getStops() {
@@ -352,6 +360,18 @@ export async function loadMissing() {
 	}
 
 	await Promise.all(missing);
+}
+
+export async function wipeRegionCachedData() {
+	await Promise.all([
+		db.stops.clear(),
+		db.routes.clear(),
+		// db.calendars.clear(),
+	]).then(() => {
+		stopsLoaded.set(false);
+		routesLoaded.set(false);
+		// calendarsLoaded.set(false);
+	});
 }
 
 export async function wipeVolatileCachedData() {
