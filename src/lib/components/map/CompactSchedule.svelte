@@ -99,9 +99,9 @@
 
 		<div class="flex flex-col border-error border-2 p-2 rounded-xl">
 			<div class="flex flex-row font-bold items-center text-error-content">
-				Informação potêncialmente incorreta
+				Isto é uma demonstração!
 			</div>
-			<div>Os horários podem estar (e provávelmente estão) errados.</div>
+			<div>Os horários podem estar errados.</div>
 		</div>
 
 		<div class="flex flex-col gap-2 p-2 overflow-y-scroll">

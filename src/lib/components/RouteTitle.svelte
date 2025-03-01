@@ -17,7 +17,7 @@
 	export let route;
 </script>
 
-<div class="title-sr-pair text-3xl">
+<div class="title-sr-pair text-xl">
 	{#if route.code}
 		<span
 			class="code"

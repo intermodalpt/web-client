@@ -51,13 +51,6 @@
 				</ul>
 			</div>
 			<h2 class="card-title">Operações na região {region.name}</h2>
-
-			<div role="alert" class="alert alert-warning">
-				<span
-					>A generalidade dos conteúdos estão indisponíveis. Considere a navegação puramente
-					ilustrativa.</span
-				>
-			</div>
 			<div class="flex flex-col gap-3">
 				{#each sortedOperators as op}
 					{#if op.logo_url}
