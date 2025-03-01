@@ -18,7 +18,7 @@
 	import { browser } from '$app/environment';
 	import { selectedRegion, getRegion, loadMissing } from '$lib/db.js';
 	import { slugify } from '$lib/utils.js';
-	import RegionPicker from '$lib/components/RegionPicker.client.svelte';
+	import RegionPicker from '$lib/components/RegionPicker.svelte';
 
 	/** @type {import('./$types').PageData} */
 	export let data;

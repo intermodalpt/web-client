@@ -216,3 +216,14 @@ export function buildSchedule(departures, calendars) {
 
 	return processedSchedule.filter((calendar) => calendar !== null);
 }
+
+
+export function slugify(string) {
+	return string
+		.normalize('NFD')
+		.replace(/[\u0300-\u036f]/g, '')
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, '-')
+		.replace(/^-+/, '')
+		.replace(/-+$/, '');
+}

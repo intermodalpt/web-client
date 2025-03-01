@@ -1,14 +1,4 @@
-import { apiServer } from '$lib/settings';
-
-function slugify(string) {
-	return string
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '')
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+/, '')
-		.replace(/-+$/, '');
-}
+import slugify from '$lib/utils';
 
 export function regionUrl(region) {
 	return `/regioes/${region.id}-${slugify(region.name)}`;
