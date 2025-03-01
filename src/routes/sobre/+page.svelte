@@ -27,24 +27,19 @@
 	import codeImg from './illustrations/code.webp';
 	import osmCompare from './illustrations/osmcompare.webp';
 	import survey from './illustrations/survey.webp';
-	import bar from './muns/bar.svg';
-	import ses from './muns/ses.svg';
-	import tml from './partners/tml.svg';
-	import cmet from './partners/cmet.svg';
 </script>
 
 <div class="brand-slide flex flex-col min-h-screen items-center justify-center">
 	<img src={logoText} alt="Intermodal" class="w-[40rem] px-2" />
 	<p class="text-xl sm:text-2xl font-extralight">
-		Uma marca para um futuro móvel, sustentável e aberto
+		Um projeto para um futuro móvel, sustentável e aberto
 	</p>
 </div>
 <div class="flex flex-col items-center py-12 px-2 bg-zinc-800 shadow-lg w-full">
 	<div class="text-white w-3/4 max-w-[100em]">
 		<p class="text-xl">
-			Somos uma equipa especialistas na criação de
-			<b>soluções digitais para apoio à mobilidade</b>.<br />Preocupamo-nos com as cidades em que
-			vivemos e nelas investimos com as nossas inovações.
+			Criamos <b>soluções digitais para apoio à mobilidade</b>.<br />Preocupamo-nos com as cidades
+			em que vivemos.
 		</p>
 		<div class="flex flex-col py-24">
 			<span class="text-xl self-center text-zinc-400">Palavras-chave</span>
@@ -60,14 +55,7 @@
 				<li>Direitos digitais</li>
 			</ul>
 		</div>
-		<p class="text-xl text-zinc-400">
-			Procuramos ser uma empresa responsável, que deixa um impacto positivo no mundo.<br />
-			Fazemos o que acreditamos ser importante para a nossa comunidade.
-		</p>
 	</div>
-</div>
-<div class="w-full flex gap-8 justify-center py-8 bg-white shadow-inner">
-	<h2 class="text-5xl self-center text-zinc-800">O que fazemos</h2>
 </div>
 <div class="w-full flex justify-center drop-shadow-lg z-10">
 	<div class="w-full grid grid-cols-1 2xl:grid-cols-2">
@@ -168,7 +156,7 @@
 							</div>
 							<div>
 								<span class="card-title">Cláudio Pereira</span>
-								<span class="text-sm">Criador de ideias</span>
+								<span class="text-sm">Tagarela Chefe</span>
 							</div>
 						</div>
 					</div>
@@ -191,7 +179,7 @@
 						</div>
 					</div>
 				</div>
-				<div class="carousel-item">
+				<!--<div class="carousel-item">
 					<div class="card w-64 xl:w-72 bg-base-100 border-2">
 						<div class="absolute h-20 bg-sky-500 w-full rounded-t-xl" />
 						<div class="card-body">
@@ -199,16 +187,16 @@
 								<div
 									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
 								>
-									<img src="/avatars/maf.webp" alt="Mafalda Antunes" />
+									<img src="/avatars/-.webp" alt="P3" />
 								</div>
 							</div>
 							<div>
-								<h2 class="card-title">Mafalda Antunes</h2>
-								<span class="text-sm">Dados, Sustentabilidade</span>
+								<h2 class="card-title">P3</h2>
+								<span class="text-sm">...</span>
 							</div>
 						</div>
 					</div>
-				</div>
+				</div>-->
 			</div>
 			<div
 				class="card card-compact max-w-[30em] bg-white border-2 absolute bottom-8 sm:bottom-16 md:bottom-32 xl:bottom-56 lg:right-16"
@@ -227,94 +215,11 @@
 		</div>
 	</div>
 </div>
-<div class="flex justify-center bg-base-100 py-16">
-	<div
-		class="w-[100em] mx-4 flex gap-16 items-start align-top content-start relative overflow-hidden flex-wrap"
-	>
-		<div>
-			<h1 class="text-3xl lg:text-5xl mb-8">Os nossos clientes</h1>
-			<div class="flex flex-wrap gap-16 shrink-0">
-				<img src={tml} alt="Transportes Metropolitanos de Lisboa" class="h-16 lg:h-24" />
-				<img src={cmet} alt="Carris Metropolitana" class="h-16 lg:h-24" />
-			</div>
-		</div>
-		<span class="divider divider-horizontal hidden" />
-		<div>
-			<h1 class="text-3xl lg:text-5xl mb-8">Autarquias cartografadas</h1>
-			<div class="flex flex-wrap gap-16">
-				<img src={bar} alt="Barreiro" class="w-48 lg:w-64" />
-				<img src={ses} alt="Sesimbra" class="w-48 lg:w-64" />
-			</div>
-		</div>
-	</div>
-</div>
 <div class="flex justify-center py-16 bg-zinc-700 text-zinc-400">
 	<div
 		class="w-[100em] mx-4 flex flex-col gap-1 items-start align-top content-start relative overflow-hidden"
 	>
-		<h1 class="text-5xl mb-2">Vem melhorar o mundo connosco</h1>
-		<p>Apresenta-te e certamente que nos veremos em futuras oportunidades!</p>
-		<p>Soluções opensource permitem-nos criar soluções de qualidade. Valorizamos intressados!</p>
-		<ul class="flex flex-wrap shrink-0 gap-4 saturate-50">
-			<li>
-				<a href="https://www.rust-lang.org">
-					<img src="foss/rust.svg" alt="Rust" class="h-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://svelte.dev">
-					<img src="foss/svelte.svg" alt="Svelte" class="h-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://www.python.org">
-					<img src="foss/python.svg" alt="Python" class="h-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://qgis.org">
-					<img src="foss/qgis.svg" alt="QGIS" class="h-16" />
-				</a>
-			</li>
-			<li><img src="foss/linux.svg" alt="Linux" class="h-16" /></li>
-			<li>
-				<a href="https://opencv.org">
-					<img src="foss/opencv.svg" alt="OpenCV" class="h-16" />
-				</a>
-			</li>
-		</ul>
-		<ul class="flex flex-wrap shrink-0 gap-4 saturate-50 mt-2">
-			<li>
-				<a href="https://www.blender.org/">
-					<img src="foss/blender.svg" alt="Blender" class="h-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://inkscape.org/">
-					<img src="foss/inkscape.svg" alt="Inkscape" class="w-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://opentoonz.github.io">
-					<img src="foss/opentoonz.svg" alt="OpenToonz" class="w-16" />
-				</a>
-			</li>
-			<li>
-				<a href="https://krita.org">
-					<img src="foss/krita.svg" alt="Krita" class="w-16" />
-				</a>
-			</li>
-		</ul>
-		<span class="flex gap-1">
-			<span>Envia-nos o teu portefólio para</span>
-			<span class="flex flex-row-reverse">
-				<span>pt</span>
-				<span>intermodal.</span>
-				<span>@</span>
-				<span>participar</span>
-			</span>
-		</span>
-		<span class="text-xs self-end">Logotipos propriedade dos respetivos projetos</span>
+		<span class="text-5xl mb-2">Vem melhorar o mundo connosco!</span>
 	</div>
 </div>
 
