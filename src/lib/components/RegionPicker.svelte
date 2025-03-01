@@ -14,13 +14,18 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { onMount, onDestroy } from 'svelte';
+	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
 	import { derived, writable } from 'svelte/store';
-	import { Map as Maplibre, NavigationControl, GeolocateControl } from 'maplibre-gl';
+	import maplibre  from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import { liveQuery } from 'dexie';
 	import { fetchRegions, getRegions, regionsLoaded, setRegion } from '$lib/db';
 	import { tileStyle } from '$lib/settings.js';
+
+	const dispatch = createEventDispatcher();
+
+	export let setsUserRegion = true;
+	export let requestsConfirmation = true;
 
 	let map;
 	let mapElem;
@@ -53,14 +58,16 @@
 	});
 
 	pendingRegion.subscribe((region) => {
-		if (!region) {
-			return;
-		}
+		if (!region) return;
+
 		regionConfirmationModal.showModal();
 	});
 
 	async function confirmPendingRegion() {
-		await setRegion($pendingRegionId);
+		if (setsUserRegion) {
+			await setRegion($pendingRegionId);
+		}
+		dispatch('select', { id: $pendingRegionId });
 		explicitRegionChange = false;
 		$pendingRegionId = null;
 	}
@@ -180,7 +187,14 @@
 		});
 
 		map.on('click', 'regions-fills', (e) => {
-			$pendingRegionId = e.features[0].id;
+			if (requestsConfirmation) {
+				$pendingRegionId = e.features[0].id;
+			} else {
+				if (setsUserRegion) {
+					setRegion(e.features[0].id);
+				}
+				dispatch('select', { id: e.features[0].id });
+			}
 		});
 
 		map.on('mousemove', 'regions-fills', (e) => {
@@ -202,7 +216,7 @@
 	}
 
 	onMount(() => {
-		map = new Maplibre({
+		map = new maplibre.Map({
 			container: mapElem,
 			style: tileStyle,
 			minZoom: 3,
@@ -212,8 +226,8 @@
 			center: [-9.1333, 38.7167]
 		});
 
-		mapGeolocateControl = new GeolocateControl();
-		map.addControl(new NavigationControl(), 'top-right');
+		mapGeolocateControl = new maplibre.GeolocateControl();
+		map.addControl(new maplibre.NavigationControl(), 'top-right');
 		map.addControl(mapGeolocateControl, 'top-right');
 
 		map.on('load', () => {
@@ -285,11 +299,15 @@
 </div>
 <dialog bind:this={regionConfirmationModal} class="modal modal-bottom sm:modal-middle">
 	<div class="modal-box">
-		<h3 class="font-bold text-lg">Escolher <b>{$pendingRegion?.name || ''}</b> como região?</h3>
-		<p class="py-4">
-			Esta definição serve para mostrar os serviços relevantes para a sua região. Pode alterar em
-			qualquer momento a partir do menu.
-		</p>
+		{#if setsUserRegion}
+			<h3 class="font-bold text-lg">Escolher <b>{$pendingRegion?.name || ''}</b> como região?</h3>
+			<p class="py-4">
+				Esta definição serve para mostrar os serviços relevantes para a sua região. Pode alterar em
+				qualquer momento a partir do menu.
+			</p>
+		{:else}
+			<h3 class="font-bold text-lg">Seleccionar <b>{$pendingRegion?.name || ''}</b>?</h3>
+		{/if}
 		<div class="modal-action">
 			<form method="dialog">
 				<button class="btn btn-success" on:click={confirmPendingRegion}>Sim</button>

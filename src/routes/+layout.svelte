@@ -15,9 +15,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { page } from '$app/stores';
-	import DbLoadingInfo from '$lib/components/DbLoadingInfo.svelte';
 	import { selectedRegion } from '$lib/db';
-	import RegionPicker from '$lib/components/RegionPicker.client.svelte';
+	import DbLoadingInfo from '$lib/components/DbLoadingInfo.svelte';
+	import RegionPicker from '$lib/components/RegionPicker.svelte';
 	import globe from '$lib/icons/ui/globe.svg';
 	import logoText from '$lib/icons/logo-text.svg';
 	import '../app.css';
