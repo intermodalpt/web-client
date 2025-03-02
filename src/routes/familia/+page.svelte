@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2023  Cláudio Pereira
+    Copyright (C) 2023 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -23,6 +23,7 @@
 	import geota from './logos/geota.svg';
 	import bragaciclavel from './logos/bragaciclavel.svg';
 	import ciclaveiro from './logos/ciclaveiro.svg';
+	import coimbrapedal from './logos/coimbrapedal.png';
 	import lpp from './logos/lpp.svg';
 	import lisboapossivel from './logos/lisboapossivel.png';
 </script>
@@ -68,6 +69,24 @@
 				</div>
 			</a>
 			<a
+				href="https://mubi.pt/"
+				target="_blank"
+				class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+			>
+				<img src={mubi} alt="Logótipo da Mubi" class="w-24 self-start" />
+				<div>
+					<h2 class="font-bold">Associação pela Mobilidade Urbana em Bicicleta</h2>
+					<p>
+						A MUBi assume como sua missão ajudar a criar condições para que qualquer pessoa possa
+						utilizar a bicicleta de forma fácil, agradável, eficiente e segura, e que os benefícios
+						desta opção sejam amplamente reconhecidos.
+					</p>
+					<div class="flex flex-wrap gap-2">
+						<div class="badge bg-blue-400">Mobilidade</div>
+					</div>
+				</div>
+			</a>
+			<a
 				href="https://zero.ong"
 				target="_blank"
 				class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
@@ -100,24 +119,6 @@
 					</p>
 					<div class="flex flex-wrap gap-2">
 						<div class="badge bg-green-400">Ambiente</div>
-						<div class="badge bg-blue-400">Mobilidade</div>
-					</div>
-				</div>
-			</a>
-			<a
-				href="https://mubi.pt/"
-				target="_blank"
-				class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
-			>
-				<img src={mubi} alt="Logótipo da Mubi" class="w-24 self-start" />
-				<div>
-					<h2 class="font-bold">Associação pela Mobilidade Urbana em Bicicleta</h2>
-					<p>
-						A MUBi assume como sua missão ajudar a criar condições para que qualquer pessoa possa
-						utilizar a bicicleta de forma fácil, agradável, eficiente e segura, e que os benefícios
-						desta opção sejam amplamente reconhecidos.
-					</p>
-					<div class="flex flex-wrap gap-2">
 						<div class="badge bg-blue-400">Mobilidade</div>
 					</div>
 				</div>
@@ -254,6 +255,24 @@
 			</div>
 		</a>
 		<a
+			href="https://coimbrapedal.pt"
+			target="_blank"
+			class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+		>
+			<img src={coimbrapedal} alt="Logótipo Coimbrapedal" class="w-24 self-start" />
+			<div>
+				<h2 class="font-bold">Combr'a'Pedal</h2>
+				<p>
+					Um movimento que pretende promover a mobilidade ciclável como alternativa aos transportes
+					motorizados na cidade de Coimbra.
+				</p>
+				<div class="flex flex-wrap gap-2">
+					<div class="badge bg-blue-400">Mobilidade</div>
+					<div class="badge border-yellow-500 badge-outline bg-white">Coimbra</div>
+				</div>
+			</div>
+		</a>
+		<a
 			href="https://lisboapossivel.pt/"
 			target="_blank"
 			class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
@@ -278,19 +297,15 @@
 	<div class="card-body">
 		<h2 class="card-title">Outros projetos</h2>
 		<p>
-			O Intermodal não apoia causas com alinhamento politico políticas nem metodologias extremistas.
-			Consideramos essencial não alienar o cidadão e vingar respeitando os demais. Projetos
-			alinhados com estes ideais são bem-vindos a apresentar-se.
+			O Intermodal não apoia causas partidárias com alinhamento politico nem metodologias
+			extremistas. Consideramos importante não alienar o cidadão. Projetos alinhados com estes
+			ideais são bem-vindos a apresentar-se.
 		</p>
-		<h2 class="card-title">"Estes projetos defendem ideais conflituosos"</h2>
+		<h2 class="card-title mt-4">"Estes projetos defendem ideais conflituosos"</h2>
 		<p>
 			Não defendemos todas as posições tomadas por estes projetos nem a inflexibilidade de algumas
-			destas posições, acreditamos todavia que sejam causas razoáveis com boas intenções e
+			destas posições, acreditamos todavia que sejam causas relativamente bem intencionadas e
 			fortemente baseadas em ciência.
-		</p>
-		<p>
-			Existe um esforço no sentido do debate. Esperamos ajudar a unir o panorama ativista nacional e
-			promover a sinergia e consistência de iniciativas.
 		</p>
 	</div>
 </div>
