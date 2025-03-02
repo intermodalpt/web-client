@@ -160,7 +160,6 @@
 		});
 	});
 	let stopDetailed = derived([selectedStopId], async ([$selectedStopId], set) => {
-		console.log('stopSpider', $selectedStopId);
 		if (!$selectedStopId) return;
 		fetch(`${apiServer}/v1/stops/${$selectedStopId}`)
 			.then((x) => x.json())
