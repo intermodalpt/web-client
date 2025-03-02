@@ -31,15 +31,15 @@
 </script>
 
 <svelte:head>
-	<title>{'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}</title>
-	<meta name="title" content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'} />
+	<title>{'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}</title>
+	<meta name="title" content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')} />
 	<meta
 		property="og:title"
-		content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}
+		content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}
 	/>
 	<meta
 		property="twitter:title"
-		content={'Intermodal - ' + $page.data.title ?? 'Mobilidade amplificada'}
+		content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}
 	/>
 	<meta
 		name="description"
@@ -66,6 +66,7 @@
 			class:absolute={$page.data.floatingMenu || false}
 			class:top-0={$page.data.floatingMenu || false}
 			class:z-[3000]={$page.data.floatingMenu || false}
+			class:hidden={$page.data.noMenu || false}
 		>
 			<div
 				class="navbar bg-base-100 sm:rounded-xl"
@@ -97,13 +98,20 @@
 				</div>
 				<div class="navbar-end hidden lg:flex">
 					<ul class="menu menu-horizontal p-0 gap-3">
-						{#if $selectedRegion}
-							<li>
+						<li>
+							{#if $selectedRegion}
 								<a href="/rede" class="p-3" class:active={$page.url.pathname.startsWith('/rede')}
 									>Mapa</a
 								>
-							</li>
-						{/if}
+							{:else}
+								<a
+									href="/rede"
+									class="p-3"
+									on:click={() => regDialog.showModal()}
+									on:keypress={() => regDialog.showModal()}>Mapa</a
+								>
+							{/if}
+						</li>
 						<li>
 							<a href="/regiao" class="p-3" class:active={$page.url.pathname.startsWith('/regiao')}
 								>Região</a
@@ -171,7 +179,13 @@
 	}}
 >
 	<div class="modal-box !max-w-[60em]">
-		<h2 class="text-lg font-bold text-center">Escolha a sua região</h2>
+		{#if $selectedRegion}
+			<h2 class="text-lg font-bold">Região atual</h2>
+			<span class="ml-2">{$selectedRegion?.name}</span>
+			<h2 class="text-lg font-bold mt-2">Alterar região</h2>
+		{:else}
+			<h2 class="text-lg font-bold text-center">Escolha a sua região</h2>
+		{/if}
 		{#if renderDialogMap}
 			<RegionPicker />
 		{/if}
@@ -185,4 +199,6 @@
 	</form>
 </dialog>
 
-<DbLoadingInfo />
+{#if $page.url.searchParams.get('debug')}
+	<DbLoadingInfo />
+{/if}

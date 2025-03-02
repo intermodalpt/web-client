@@ -155,7 +155,7 @@
 				<div class="flex flex-col gap-4">
 					<a
 						href="https://editor.intermodal.pt"
-						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-zinc-50 rounded-lg"
 					>
 						<img src={logo} alt="Editor" class="w-24 h-24" />
 						<div>
@@ -166,9 +166,9 @@
 							</p>
 						</div>
 					</a>
-					<a
+					<!-- <a
 						href="https://biblioteca.intermodal.pt"
-						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-zinc-50 rounded-lg"
 					>
 						<img src={books} alt="Biblioteca" class="w-24 h-24" />
 						<div>
@@ -181,7 +181,7 @@
 					</a>
 					<a
 						href="https://forum.intermodal.pt"
-						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-zinc-50 rounded-lg"
 					>
 						<img src={discourse} alt="Forum" class="w-24" />
 						<div>
@@ -191,10 +191,10 @@
 								comunidade de intressados em mobilidade, acessibilidade e urbanismo.
 							</p>
 						</div>
-					</a>
+					</a> -->
 					<a
 						href="https://signal.me/#p/+351910551803"
-						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-zinc-50 rounded-lg"
 					>
 						<img src={signal} alt="Signal" class="w-24" />
 						<div>
@@ -205,9 +205,9 @@
 							</p>
 						</div>
 					</a>
-					<a
+					<!--<a
 						href="https://wa.me/351910551803"
-						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-base-300 rounded-lg"
+						class="flex flex-col sm:flex-row gap-3 p-4 hover:bg-zinc-50 rounded-lg"
 					>
 						<img src={wpp} alt="Whatsapp" class="w-24" />
 						<div>
@@ -217,7 +217,7 @@
 								dispor!
 							</p>
 						</div>
-					</a>
+					</a>-->
 				</div>
 			</div>
 		</div>
@@ -257,12 +257,12 @@
 					<a href="https://ciberlandia.pt/@intermodal">
 						<img src={mastodon} class="w-10 drop-shadow-md" alt="Mastodon" />
 					</a>
-					<button onclick="fb_warning.showModal()">
+					<!--<button onclick="fb_warning.showModal()">
 						<img src={facebook} class="w-10" alt="Facebook" />
 					</button>
 					<button onclick="ig_warning.showModal()">
 						<img src={instagram} class="w-10 drop-shadow-md" alt="Instagram" />
-					</button>
+					</button>-->
 				</div>
 			</div>
 			<div>
