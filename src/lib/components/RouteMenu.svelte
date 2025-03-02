@@ -23,22 +23,22 @@
 
 <div role="tablist" class="tabs tabs-bordered mx-auto mb-4">
 	<a
-		href="/regiao/{regionId}/{operatorTag}/{route.id}/informacao"
+		href="/regioes/{regionId}/{operatorTag}/{route.id}/informacao"
 		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('informacao')}>Informação</a
 	>
 	<a
-		href="/regiao/{regionId}/{operatorTag}/{route.id}/horario"
+		href="/regioes/{regionId}/{operatorTag}/{route.id}/horario"
 		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('horario')}>Horário</a
 	>
 	<a
-		href="/regiao/{regionId}/{operatorTag}/{route.id}/percurso"
+		href="/regioes/{regionId}/{operatorTag}/{route.id}/percurso"
 		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('percurso')}>Percurso</a
 	>
 	<a
-		href="/regiao/{regionId}/{operatorTag}/{route.id}/paragens"
+		href="/regioes/{regionId}/{operatorTag}/{route.id}/paragens"
 		class="tab tab-lg"
 		class:tab-active={$page.url.pathname.endsWith('paragens')}>Paragens</a
 	>
