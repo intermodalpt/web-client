@@ -38,7 +38,7 @@
 		<div class="flex justify-end">
 			<a href="/iniciativas/dialogos-para-a-mobilidade" class="btn btn-primary">Ler mais</a>
 		</div>
-		<hr class="my-4" />
+		<!-- <hr class="my-4" />
 		<h2 class="text-3xl font-bold">Muro da Vergonha</h2>
 		<p>
 			Alguns dos mais graves problemas em Portugal não são noticiados; são invisíveis ao comum dos
@@ -47,7 +47,7 @@
 		</p>
 		<div class="flex justify-end">
 			<a href="/iniciativas/muro-da-vergonha" class="btn btn-primary">Consultar</a>
-		</div>
+		</div> -->
 		<hr class="my-4" />
 		<h2 class="text-3xl font-bold">Panorama Limpo</h2>
 		<p>
