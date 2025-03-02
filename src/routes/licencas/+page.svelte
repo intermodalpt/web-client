@@ -59,6 +59,13 @@
 			uso dos logótipos afim de identificar e educar para os serviços de transporte. Não detemos
 			qualquer direito sobre os mesmos alem do conferido pela lei.
 		</p>
+		<p>
+			Destacamos também a utilização de icons OpenMoji, que são disponibilizados sob a licença <a
+				class="link"
+				href="https://creativecommons.org/licenses/by-sa/4.0/"
+				target="_blank">CC BY-SA 4.0</a
+			>
+		</p>
 		<h2 class="card-title">Cartografia</h2>
 		<p>
 			Os mapas exibidos são tendencialmente projeções personalizadas do <a
