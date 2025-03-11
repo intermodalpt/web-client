@@ -17,7 +17,7 @@
 </svelte:head>
 
 <div class="flex flex-col gap-4">
-	<div class="card bg-base-100 shadow-sm rounded-lg">
+	<div class="card bg-base-100 shadow-xs rounded-lg">
 		<div class="card-body text-lg gap-10">
 			<p>Certo dia um individuo fez uma boa ação.</p>
 			<div class="flex flex-wrap justify-around">
@@ -64,7 +64,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="card bg-base-100 shadow-sm rounded-lg">
+	<div class="card bg-base-100 shadow-xs rounded-lg">
 		<div class="card-body text-lg">
 			<h2 class="card-title">Ajuda-me neste projeto!</h2>
 			<p>

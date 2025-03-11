@@ -92,7 +92,7 @@
 							</svg>
 						</label>
 					</div>
-					<a class="btn btn-ghost hover:bg-zinc-100" href="/">
+					<a class="btn btn-lg btn-ghost hover:bg-zinc-100 border-0" href="/">
 						<img src={logoText} class="h-8 max-w-[60vw]" alt="Início,Logotipo" />
 					</a>
 				</div>
@@ -100,7 +100,7 @@
 					<ul class="menu menu-horizontal p-0 gap-3">
 						<li>
 							{#if $selectedRegion}
-								<a href="/rede" class="p-3" class:active={$page.url.pathname.startsWith('/rede')}
+								<a href="/rede" class="p-3" class:menu-active={$page.url.pathname.startsWith('/rede')}
 									>Mapa</a
 								>
 							{:else}
@@ -113,18 +113,18 @@
 							{/if}
 						</li>
 						<li>
-							<a href="/regiao" class="p-3" class:active={$page.url.pathname.startsWith('/regiao')}
+							<a href="/regiao" class="p-3" class:menu-active={$page.url.pathname.startsWith('/regiao')}
 								>Região</a
 							>
 						</li>
 						<li>
-							<a href="/edu" class="p-3" class:active={$page.url.pathname.startsWith('/edu')}>
+							<a href="/edu" class="p-3" class:menu-active={$page.url.pathname.startsWith('/edu')}>
 								Educação
 							</a>
 						</li>
 						<li>
 							<button
-								class="bg-base-200 border h-full flex"
+								class="btn bg-base-200 hover:bg-base-300 border-0 h-full flex"
 								aria-label="Escolher região"
 								on:click={() => {
 									regDialog.showModal();
@@ -141,7 +141,7 @@
 
 		<slot />
 	</div>
-	<div class="drawer-side z-[10000]">
+	<div class="drawer-side z-10000">
 		<label for="drawer" aria-label="close sidebar" class="drawer-overlay" />
 		<ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
 			<li><a href="/rede" on:click={closeDrawer} on:keypress={closeDrawer}>Mapa</a></li>
@@ -178,7 +178,7 @@
 		renderDialogMap = false;
 	}}
 >
-	<div class="modal-box !max-w-[60em]">
+	<div class="modal-box max-w-[60em]!">
 		{#if $selectedRegion}
 			<h2 class="text-lg font-bold">Região atual</h2>
 			<span class="ml-2">{$selectedRegion?.name}</span>

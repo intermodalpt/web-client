@@ -5,7 +5,7 @@
 </script>
 
 <footer
-	class="footer p-10 bg-base-300 text-base-content rounded-t-xl w-[min(960px,100%)] self-center"
+	class="footer sm:footer-horizontal p-10 bg-base-300 text-base-content rounded-t-xl w-[min(960px,100%)] self-center"
 >
 	<nav>
 		<h6 class="footer-title">Sub-projetos</h6>
@@ -31,13 +31,13 @@
 	<nav class="md:justify-self-end self-end">
 		<div class="grid grid-flow-col gap-4">
 			<a href="https://ciberlandia.pt/@intermodal">
-				<img src={mastodon} class="w-10 drop-shadow-sm" alt="Mastodon" />
+				<img src={mastodon} class="w-10 drop-shadow-xs" alt="Mastodon" />
 			</a>
 			<a href="https://gitlab.com/intermodalpt">
-				<img src={gitlab} class="w-10 drop-shadow-sm" alt="Gitlab" />
+				<img src={gitlab} class="w-10 drop-shadow-xs" alt="Gitlab" />
 			</a>
 			<a href="https://github.com/intermodalpt">
-				<img src={github} class="w-10 drop-shadow-sm" alt="Github" />
+				<img src={github} class="w-10 drop-shadow-xs" alt="Github" />
 			</a>
 		</div>
 	</nav>

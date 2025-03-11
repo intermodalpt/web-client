@@ -355,7 +355,7 @@
 			<StopAttrs {stop} showPrimary={false}/>
 		</div>
 	</div>
-	<div class="card card-compact w-full bg-base-100 shadow-md">
+	<div class="card card-sm w-full bg-base-100 shadow-md">
 		<div class="card-body">
 			<h2 class="card-title">Fotografias</h2>
 			{#if $pictures?.length}
@@ -384,7 +384,7 @@
 			{/if}
 		</div>
 	</div>
-	<div class="card card-compact w-full bg-base-100 shadow-md">
+	<div class="card card-sm w-full bg-base-100 shadow-md">
 		<div class="card-body">
 			<h2 class="card-title">Localização</h2>
 			<div id="stop-map" class="w-full" />

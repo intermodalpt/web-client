@@ -531,8 +531,8 @@
 </svelte:head>
 
 {#if loading}
-	<div style="background-color: #33336699" class="z-[2000] absolute inset-0 backdrop-blur-sm" />
-	<div class="absolute inset-x-0 m-auto w-full md:w-96 w z-[2001] top-32">
+	<div style="background-color: #33336699" class="z-2000 absolute inset-0 backdrop-blur-xs" />
+	<div class="absolute inset-x-0 m-auto w-full md:w-96 w z-2001 top-32">
 		<div class="m-2 p-4 bg-base-100 flex flex-col gap-4 rounded-2xl shadow-lg max-h-full">
 			<span class="text-center -mt-2 -mb-1">A carregar...</span>
 			<span
@@ -582,7 +582,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeInfo'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem]"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-10000 overflow-hidden shadow-xl w-full lg:w-[28rem]"
 			>
 				<RouteInfo
 					route={selectedRoute}
@@ -594,7 +594,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeSchedule'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-[10000] shadow-xl w-full lg:w-[28rem]"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-auto bg-base-100 lg:rounded-tl-2xl z-10000 shadow-xl w-full lg:w-[28rem]"
 			>
 				<div id="schedule" class="flex flex-col w-full">
 					<WHeader
@@ -609,7 +609,7 @@
 			</div>
 		{:else if $lastInStack.activity === 'routeStops'}
 			<div
-				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-[10000] overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
+				class="lg:fixed lg:right-0 lg:bottom-0 h-2/5 lg:h-4/5 bg-base-100 lg:rounded-tl-2xl z-10000 overflow-hidden shadow-xl w-full lg:w-[28rem] flex flex-col"
 			>
 				<WHeader
 					backBtn="true"

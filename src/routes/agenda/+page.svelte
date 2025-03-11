@@ -297,7 +297,7 @@
 	});
 </script>
 
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<div class="breadcrumbs -mt-6">
 			<ul>
@@ -355,7 +355,7 @@
 						<div class="flex flex-wrap gap-2">
 							{#each event.fields as field}
 								<div class="badge {fieldColorClass[field]}">
-									<span class="text-white drop-shadow-sm font-bold">{field}</span>
+									<span class="text-white drop-shadow-xs font-bold">{field}</span>
 								</div>
 							{/each}
 							<div class="badge border-yellow-500 badge-outline bg-white">{event.location}</div>
@@ -387,9 +387,9 @@
 	</div>
 </div>
 
-<div bind:this={mapElem} class="h-96 rounded-xl shadow-sm" />
+<div bind:this={mapElem} class="h-96 rounded-xl shadow-xs" />
 
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<h2 class="card-title">Eventos Passados</h2>
 		<div class="flex flex-wrap">

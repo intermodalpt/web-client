@@ -36,7 +36,7 @@
 </script>
 
 <div class="w-full">
-	<div class="card card-compact bg-base-100 shadow-sm">
+	<div class="card card-sm bg-base-100 shadow-xs">
 		<div class="card-body">
 			<h2 class="text-lg font-bold text-center">
 				Escolha uma região no

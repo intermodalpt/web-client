@@ -125,49 +125,49 @@
 			</div>
 		{/if}
 		{#if stop.a11y.has_shelter === true}
-			<div class="tooltip z-[10000]" data-tip="Abrigo">
+			<div class="tooltip z-10000" data-tip="Abrigo">
 				<img class="h-12" src={shelter} alt="Abrigo" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_bench === true}
-			<div class="tooltip z-[10000]" data-tip="Banco">
+			<div class="tooltip z-10000" data-tip="Banco">
 				<img class="h-12" src={bench} alt="Banco" />
 			</div>
 		{/if}
 	{/if}
 	{#if showSecondary}
 		{#if stop.a11y.has_flag === true}
-			<div class="tooltip z-[10000]" data-tip="Identificada">
+			<div class="tooltip z-10000" data-tip="Identificada">
 				<img class="h-12" src={flag} alt="Identificada" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_schedules === true}
-			<div class="tooltip z-[10000]" data-tip="Horários">
+			<div class="tooltip z-10000" data-tip="Horários">
 				<img class="h-12" src={schedules} alt="Horários" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_sidewalk === true}
-			<div class="tooltip z-[10000]" data-tip="Passeio">
+			<div class="tooltip z-10000" data-tip="Passeio">
 				<img class="h-12" src={sidewalk} alt="Passeio" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_trash_can === true}
-			<div class="tooltip z-[10000]" data-tip="Balde do Lixo">
+			<div class="tooltip z-10000" data-tip="Balde do Lixo">
 				<img class="h-12" src={garbage} alt="Balde do Lixo" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_visibility_from_area === true}
-			<div class="tooltip z-[10000]" data-tip="Visibilidade">
+			<div class="tooltip z-10000" data-tip="Visibilidade">
 				<img class="h-12" src={visibility} alt="Visibilidade" />
 			</div>
 		{/if}
 		{#if stop.a11y.has_visibility_from_within === true}
-			<div class="tooltip z-[10000]" data-tip="Visibilidade exterior">
+			<div class="tooltip z-10000" data-tip="Visibilidade exterior">
 				<img class="h-12" src={visibilityWithin} alt="Visibilidade exterior" />
 			</div>
 		{/if}
 		{#if stop.a11y.is_visible_from_outside === true}
-			<div class="tooltip z-[10000]" data-tip="Facilmente visível pelo motorista">
+			<div class="tooltip z-10000" data-tip="Facilmente visível pelo motorista">
 				<img class="h-12" src={visible} alt="Facilmente visível pelo motorista" />
 			</div>
 		{/if}

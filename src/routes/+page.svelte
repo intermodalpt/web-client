@@ -55,7 +55,7 @@
 >
 	<div class="w-[min(960px,100%)] flex flex-col gap-6 mx-2 xl:mx-0 lg:mt-2">
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			class="card card-sm lg:card-md bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -70,7 +70,7 @@
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			class="card card-sm lg:card-md bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -101,7 +101,7 @@
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			class="card card-sm lg:card-md bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -147,7 +147,7 @@
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			class="card card-sm lg:card-md bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -222,7 +222,7 @@
 			</div>
 		</div>
 		<div
-			class="card card-compact lg:card-normal bg-[#ffffff77] sm:mx-2 lg:mx-0"
+			class="card card-sm lg:card-md bg-[#ffffff77] sm:mx-2 lg:mx-0"
 			style="box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);"
 		>
 			<div class="card-body">
@@ -246,7 +246,7 @@
 					<a href="https://www.openstreetmap.org/about">
 						<img src={osm} class="w-10" alt="OpenStreetMap" />
 					</a>
-					<button onclick="lpp_warning.showModal()">
+					<button onclick={() => document.querySelector('#lpp_warning').showModal()}>
 						<img src={lpp} class="w-20" alt="Lisboa para Pessoas" />
 					</button>
 				</div>

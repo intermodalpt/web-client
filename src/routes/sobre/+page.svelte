@@ -141,15 +141,15 @@
 <div class="relative bg-white">
 	<div class="team-slide-inner flex justify-center">
 		<div class="mx-4 flex flex-col gap-8 relative" style="width: calc(min(100%,100em));">
-			<h1 class="text-5xl mt-20">Equipa</h1>
+			<h1 class="text-5xl mt-24">Equipa</h1>
 			<div class="w-full carousel carousel-center space-x-4 rounded-box overflow-auto">
 				<div class="carousel-item">
-					<div class="card w-64 xl:w-72 bg-base-100 border-2">
+					<div class="card w-64 xl:w-72 bg-base-100 border-2 border-base-300">
 						<div class="absolute h-20 bg-red-600 w-full rounded-t-xl" />
 						<div class="card-body">
 							<div class="avatar">
 								<div
-									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2"
+									class="w-24 rounded-full ring-1 ring-base-200 ring-offset-2"
 								>
 									<img src="/avatars/claudio.webp" alt="Cláudio Pereira" />
 								</div>
@@ -162,12 +162,12 @@
 					</div>
 				</div>
 				<div class="carousel-item">
-					<div class="card w-64 xl:w-72 bg-base-100 border-2">
+					<div class="card w-64 xl:w-72 bg-base-100 border-2 border-base-300">
 						<div class="absolute h-20 bg-lime-500 w-full rounded-t-xl" />
 						<div class="card-body">
 							<div class="avatar">
 								<div
-									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
+									class="w-24 rounded-full ring-1 ring-base-200 ring-offset-2"
 								>
 									<img src="/avatars/theo.webp" alt="João Bebiano" />
 								</div>
@@ -185,7 +185,7 @@
 						<div class="card-body">
 							<div class="avatar">
 								<div
-									class="w-24 rounded-full ring ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
+									class="w-24 rounded-full ring-3 ring-base-300 ring-offset-base-100 ring-offset-2 bg-black"
 								>
 									<img src="/avatars/-.webp" alt="P3" />
 								</div>
@@ -199,7 +199,7 @@
 				</div>-->
 			</div>
 			<div
-				class="card card-compact max-w-[30em] bg-white border-2 absolute bottom-8 sm:bottom-16 md:bottom-32 xl:bottom-56 lg:right-16"
+				class="card card-sm max-w-[30em] bg-white border-2 border-base-300 absolute bottom-8 sm:bottom-16 md:bottom-32 xl:bottom-56 lg:right-16"
 			>
 				<div class="card-body">
 					<h2 class="card-title">Contributos</h2>

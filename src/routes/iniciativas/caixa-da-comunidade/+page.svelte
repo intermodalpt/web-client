@@ -156,7 +156,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
-<div class="card flex flex-col bg-base-100 shadow-sm rounded-xl relative">
+<div class="card flex flex-col bg-base-100 shadow-xs rounded-xl relative">
 	<div class="card-body">
 		<div class="breadcrumbs hidden lg:block -mt-6">
 			<ul>
@@ -219,7 +219,7 @@
 	</div>
 </div>
 
-<div class="card card-compact flex flex-col shadow-sm rounded-xl relative bg-slate-900">
+<div class="card card-sm flex flex-col shadow-xs rounded-xl relative bg-slate-900">
 	<svg
 		class="absolute top-0 bottom-0 left-0 right-0 h-full w-full overflow-hidden rounded-xl aopacity-20"
 		preserveAspectRatio="xMidYMid slice"

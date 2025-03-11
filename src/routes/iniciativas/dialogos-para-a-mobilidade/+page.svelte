@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
-<div class="card flex flex-col bg-base-100 shadow-sm rounded-xl relative">
-	<div class="card card-compact bg-base-100 shadow-sm absolute -left-56 hidden 2xl:flex">
+<div class="card flex flex-col bg-base-100 shadow-xs rounded-xl relative">
+	<div class="card card-sm bg-base-100 shadow-xs absolute -left-56 hidden 2xl:flex">
 		<div class="card-body">
 			<h2 class="card-title">Índice</h2>
 			<div class="text-lg flex flex-col gap-2">

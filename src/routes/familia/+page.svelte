@@ -28,7 +28,7 @@
 	import lisboapossivel from './logos/lisboapossivel.png';
 </script>
 
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<div class="breadcrumbs -mt-6">
 			<ul>
@@ -47,7 +47,7 @@
 		</p>
 	</div>
 </div>
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<h2 class="card-title">Âmbito Nacional</h2>
 
@@ -193,7 +193,7 @@
 		</div>
 	</div>
 </div>
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<h2 class="card-title">Âmbito Regional</h2>
 		<a
@@ -293,7 +293,7 @@
 		</a>
 	</div>
 </div>
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<h2 class="card-title">Outros projetos</h2>
 		<p>

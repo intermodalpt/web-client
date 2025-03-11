@@ -18,10 +18,11 @@
 		<div class="card-body">
 			<h2 class="card-title">⚠️⚠️⚠️ Conteúdo ilustrativo⚠️⚠️⚠️</h2>
 			<p>Esta página é uma prova de conceito. Os dados são falsos.</p>
+			<p>Temos alguns verdadeiros na <a class="link link-primary" href="/estado">errata</a>.</p>
 		</div>
 	</div>
 
-	<div class="card card-compact bg-base-100 shadow-xl mx-2">
+	<div class="card card-sm bg-base-100 shadow-xl mx-2">
 		<div class="collapse collapse-arrow rounded-box">
 			<input type="checkbox" class="cursor-pointer" />
 			<div class="collapse-title text-xl font-medium flex flex-row justify-between">
@@ -31,7 +32,7 @@
 					<span class="badge badge-info">1</span>
 				</div>
 			</div>
-			<div class="collapse-content !p-0">
+			<div class="collapse-content p-0!">
 				<div class="p-1 text-sm flex flex-col gap-2">
 					<div class="flex flex-col border-info border-2 p-2 rounded-xl">
 						<div class="flex flex-row font-bold items-center text-info-content">
@@ -39,7 +40,7 @@
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
 								viewBox="0 0 24 24"
-								class="stroke-current flex-shrink-0 w-6 h-6"
+								class="stroke-current shrink-0 w-6 h-6"
 							>
 								<path
 									stroke-linecap="round"
@@ -60,7 +61,7 @@
 						<div class="flex flex-row font-bold items-center text-error-content">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								class="stroke-current flex-shrink-0 h-6 w-6"
+								class="stroke-current shrink-0 h-6 w-6"
 								fill="none"
 								viewBox="0 0 24 24"
 								><path
@@ -72,18 +73,14 @@
 							</svg>
 							Supressão de linhas
 						</div>
-						<div>
-							As novas linhas na númeração 4xxx poderão estar a funcionar, bem como poderão não
-							estar.<br />
-							Vá de comboio se o tiver!
-						</div>
+						<div>A linha 5432 poderá estar a funcionar, bem como poderá não estar.</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="card card-compact bg-base-100 shadow-xl mx-2">
+	<div class="card card-sm bg-base-100 shadow-xl mx-2">
 		<div class="collapse collapse-arrow rounded-box">
 			<input type="checkbox" class="cursor-pointer" />
 			<div class="collapse-title text-xl font-medium flex flex-row justify-between">
@@ -92,13 +89,13 @@
 					<div class="badge badge-warning">1</div>
 				</div>
 			</div>
-			<div class="collapse-content !p-0">
+			<div class="collapse-content p-0!">
 				<div class="p-1 text-sm flex flex-col gap-2">
 					<div class="flex flex-col border-warning border-2 p-2 rounded-xl">
 						<div class="flex flex-row font-bold items-center text-warning-content">
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
-								class="stroke-current flex-shrink-0 h-6 w-6"
+								class="stroke-current shrink-0 h-6 w-6"
 								fill="none"
 								viewBox="0 0 24 24"
 							>

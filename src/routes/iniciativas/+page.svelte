@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 
-<div class="card bg-base-100 w-full shadow-sm gap-4 px-2 lg:px-0">
+<div class="card bg-base-100 w-full shadow-xs gap-4 px-2 lg:px-0">
 	<div class="card-body">
 		<div class="breadcrumbs -mt-6">
 			<ul>

@@ -53,7 +53,7 @@
 	}
 </script>
 
-<div class="card bg-base-100 shadow-sm">
+<div class="card bg-base-100 shadow-xs">
 	<div class="card-body -mt-6">
 		<div class="breadcrumbs">
 			<ul>

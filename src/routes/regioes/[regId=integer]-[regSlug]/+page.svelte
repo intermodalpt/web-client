@@ -35,7 +35,7 @@
 </script>
 
 <div class="w-full">
-	<div class="card bg-base-100 shadow-sm card-compact lg:card-normal">
+	<div class="card bg-base-100 shadow-xs card-sm lg:card-md">
 		<div class="card-body">
 			<div class="breadcrumbs hidden lg:block -mt-6">
 				<ul>
@@ -56,33 +56,33 @@
 					{#if op.logo_url}
 						{#if operatorsWithIllustrations.has(op.id)}
 							<a
-								class="border rounded-xl cursor-pointer h-24 p-2 !bg-origin-content !bg-contain hover:!bg-zinc-50 hidden md:flex flex-col justify-between items-stretch"
+								class="border rounded-xl cursor-pointer h-24 p-2 bg-origin-content! bg-contain! hover:bg-zinc-50! hidden md:flex flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 								style="background: bottom 0.2em right no-repeat url('/operators/{op.tag}/vehicle.svg')"
 							>
 								<span
-									class="block !bg-contain !bg-left-top !bg-no-repeat grow"
+									class="block bg-contain! bg-left-top! bg-no-repeat! grow"
 									style="background: url('{op.logo_url}')"
 								/>
 								<span class="text-xl font-bold">{op.name}</span>
 							</a>
 							<a
-								class="border rounded-xl cursor-pointer hover:!bg-zinc-50 h-24 p-2 flex md:hidden flex-col justify-between items-stretch"
+								class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex md:hidden flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 							>
 								<span
-									class="block !bg-contain !bg-left-top !bg-no-repeat grow"
+									class="block bg-contain! bg-left-top! bg-no-repeat! grow"
 									style="background: url('{op.logo_url}')"
 								/>
 								<span class="text-xl font-bold">{op.name}</span>
 							</a>
 						{:else}
 							<a
-								class="border rounded-xl cursor-pointer hover:!bg-zinc-50 h-24 p-2 flex flex-col justify-between items-stretch"
+								class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 							>
 								<span
-									class="block !bg-contain !bg-left-top !bg-no-repeat grow"
+									class="block bg-contain! bg-left-top! bg-no-repeat! grow"
 									style="background: url({op.logo_url})"
 								/>
 								<span class="text-xl font-bold">{op.name}</span>
@@ -90,7 +90,7 @@
 						{/if}
 					{:else}
 						<a
-							class="border rounded-xl cursor-pointer hover:!bg-zinc-50 h-24 p-2 flex flex-col justify-end items-stretch"
+							class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-end items-stretch"
 							href={operatorWithinRegionUrl(region, op)}
 						>
 							<span class="text-xl font-bold">{op.name}</span>

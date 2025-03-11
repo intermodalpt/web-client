@@ -138,7 +138,7 @@
 	</div>
 {/if}
 <dialog bind:this={picDialogElem} id="pic-dialog" class="modal modal-bottom sm:modal-middle">
-	<div class="modal-box !max-w-full overflow-hidden">
+	<div class="modal-box max-w-full! overflow-hidden">
 		<form method="dialog">
 			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2 bg-error">✕</button>
 		</form>

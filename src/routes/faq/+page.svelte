@@ -14,7 +14,7 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <div class="flex flex-col w-full gap-4 px-2 lg:px-0">
-	<div class="card bg-base-100 shadow-sm">
+	<div class="card bg-base-100 shadow-xs">
 		<div class="card-body">
 			<h2 class="card-title">Sobre o projeto</h2>
 			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
@@ -68,7 +68,7 @@
 			</div>
 		</div>
 	</div>
-	<div class="card bg-base-100 shadow-sm">
+	<div class="card bg-base-100 shadow-xs">
 		<div class="card-body">
 			<h2 class="card-title">Sobre os transportes</h2>
 			<div tabindex="0" class="collapse border border-base-300 bg-base-100 rounded-box">
