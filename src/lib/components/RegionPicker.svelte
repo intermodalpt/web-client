@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -13,48 +13,49 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
-<script>
-	import { onMount, onDestroy, createEventDispatcher } from 'svelte';
+<script lang="ts">
+	import { onMount, onDestroy } from 'svelte';
 	import { derived, writable } from 'svelte/store';
-	import maplibre  from 'maplibre-gl';
+	import maplibre from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
-	import { liveQuery } from 'dexie';
-	import { fetchRegions, getRegions, regionsLoaded, setRegion } from '$lib/db';
-	import { tileStyle } from '$lib/settings.js';
+	import { fetchLocalRegions, getLocalRegions, setRegion } from '$lib/db';
+	import { tileStyle } from '$lib/settings';
 
-	const dispatch = createEventDispatcher();
+	interface Properties {
+		onselect?: (id: number) => void;
+		setsUserRegion?: boolean;
+		requestsConfirmation?: boolean;
+	}
+	const { setsUserRegion = true, requestsConfirmation = true, onselect} : Properties = $props();
 
-	export let setsUserRegion = true;
-	export let requestsConfirmation = true;
+	let map: maplibre.Map;
+	let mapElem: HTMLDivElement;
 
-	let map;
-	let mapElem;
-	let regionConfirmationModal;
-	let mapGeolocateControl;
-	let isGeolocating = false;
+	let regionConfirmationModal: HTMLDialogElement;
+	let mapGeolocateControl: maplibre.GeolocateControl;
 
+	let isGeolocating = $state(false);
 	let mapLoaded = false;
 
-	let hoveredRegionId = null;
+	let hoveredRegionId: number | null = null;
 	let explicitRegionChange = false;
 
 	const DEFAULT_BOUNDS = [
-		[-11, 36.5],
-		[-5.5, 42.35]
+		[-13, 34.5],
+		[-3.5, 44.35]
+		// [-11, 36.5],
+		// [-5.5, 42.35]
 	];
 
-	const regions = liveQuery(() => getRegions());
+	let regions: any[] | undefined;
+
 	const pendingRegionId = writable();
 
-	const pendingRegion = derived([regions, pendingRegionId], ([$regions, $pendingRegionId]) => {
-		if (!$pendingRegionId || !$regions) {
+	const pendingRegion = derived(pendingRegionId, ($pendingRegionId) => {
+		if (!$pendingRegionId || !regions) {
 			return null;
 		}
-		return $regions.find((r) => r.id == $pendingRegionId);
-	});
-
-	regions.subscribe((regs) => {
-		drawRegions();
+		return regions.find((r) => r.id == $pendingRegionId);
 	});
 
 	pendingRegion.subscribe((region) => {
@@ -67,19 +68,19 @@
 		if (setsUserRegion) {
 			await setRegion($pendingRegionId);
 		}
-		dispatch('select', { id: $pendingRegionId });
+		onselect?.($pendingRegionId);
 		explicitRegionChange = false;
 		$pendingRegionId = null;
 	}
 
 	function drawRegions() {
-		if (!mapLoaded || !$regions) {
+		if (!mapLoaded || !regions) {
 			return;
 		}
 
 		map.getSource('regions').setData({
 			type: 'FeatureCollection',
-			features: $regions.map((region) => ({
+			features: regions.map((region) => ({
 				type: 'Feature',
 				id: region.id,
 				properties: {
@@ -90,13 +91,6 @@
 			}))
 		});
 	}
-
-	async function loadData() {
-		await Promise.all([fetchRegions()]);
-	}
-	loadData().then(async () => {
-		console.log('Region picker data loaded');
-	});
 
 	const regionTabs = {
 		north: 1,
@@ -193,7 +187,7 @@
 				if (setsUserRegion) {
 					setRegion(e.features[0].id);
 				}
-				dispatch('select', { id: e.features[0].id });
+				onselect?.(e.features[0].id);
 			}
 		});
 
@@ -216,17 +210,26 @@
 	}
 
 	onMount(() => {
+		fetchLocalRegions().then(async () => {
+			regions = await getLocalRegions();
+			drawRegions();
+		});
+
 		map = new maplibre.Map({
 			container: mapElem,
 			style: tileStyle,
-			minZoom: 3,
+			minZoom: 2,
 			zoom: 3,
 			maxZoom: 11,
 			maxBounds: DEFAULT_BOUNDS,
 			center: [-9.1333, 38.7167]
 		});
 
-		mapGeolocateControl = new maplibre.GeolocateControl();
+		mapGeolocateControl = new maplibre.GeolocateControl({
+			positionOptions: {
+				enableHighAccuracy: true
+			}
+		});
 		map.addControl(new maplibre.NavigationControl(), 'top-right');
 		map.addControl(mapGeolocateControl, 'top-right');
 
@@ -234,40 +237,38 @@
 			addSourcesAndLayers();
 			addEvents();
 			mapLoaded = true;
-			if ($regionsLoaded) {
-				drawRegions();
-			}
+			drawRegions();
 		});
 	});
 
 	onDestroy(() => {
 		mapLoaded = false;
-		map.remove();
+		map?.remove();
 	});
 </script>
 
 <div>
 	<div role="tablist" class="tabs tabs-lg tabs-bordered justify-start" class:hidden={!$regionTab}>
-		<button role="tab" class="tab" on:click={() => ($regionTab = null)}>Voltar</button>
+		<button role="tab" class="tab" onclick={() => ($regionTab = null)}>Voltar</button>
 	</div>
 	<div role="tablist" class="tabs tabs-lg tabs-bordered" class:hidden={$regionTab}>
 		<button
 			role="tab"
 			class="tab"
 			class:tab-active={$regionTab == regionTabs.north}
-			on:click={() => ($regionTab = regionTabs.north)}>Norte</button
+			onclick={() => ($regionTab = regionTabs.north)}>Norte</button
 		>
 		<button
 			role="tab"
 			class="tab"
 			class:tab-active={$regionTab == regionTabs.center}
-			on:click={() => ($regionTab = regionTabs.center)}>Centro</button
+			onclick={() => ($regionTab = regionTabs.center)}>Centro</button
 		>
 		<button
 			role="tab"
 			class="tab"
 			class:tab-active={$regionTab == regionTabs.south}
-			on:click={() => ($regionTab = regionTabs.south)}>Sul</button
+			onclick={() => ($regionTab = regionTabs.south)}>Sul</button
 		>
 	</div>
 	<div
@@ -282,13 +283,13 @@
 			{#if isGeolocating}
 				<span class="text-3xl text-neutral">A obter a sua localização</span>
 				<span class="text-lg text-neutral">(pode ter de aceitar)</span>
-				<progress class="progress w-56" />
+				<progress class="progress w-56"></progress>
 			{:else}
 				<span class="text-3xl text-neutral">Escolha a zona do país</span>
 				<button
 					class="btn btn-primary"
 					class:hidden={isGeolocating}
-					on:click={() => {
+					onclick={() => {
 						isGeolocating = true;
 						mapGeolocateControl.trigger();
 					}}>Utilizar a minha localização</button
@@ -310,8 +311,8 @@
 		{/if}
 		<div class="modal-action">
 			<form method="dialog">
-				<button class="btn btn-success" on:click={confirmPendingRegion}>Sim</button>
-				<button class="btn" on:click={() => ($pendingRegionId = null)}>Não</button>
+				<button class="btn btn-success" onclick={confirmPendingRegion}>Sim</button>
+				<button class="btn" onclick={() => ($pendingRegionId = null)}>Não</button>
 			</form>
 		</div>
 	</div>

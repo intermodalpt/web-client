@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -13,8 +13,8 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
-<script>
-	import { page } from '$app/stores';
+<script lang="ts">
+	import { page, navigating } from '$app/state';
 	import { selectedRegion } from '$lib/db';
 	import DbLoadingInfo from '$lib/components/DbLoadingInfo.svelte';
 	import RegionPicker from '$lib/components/RegionPicker.svelte';
@@ -22,56 +22,59 @@
 	import logoText from '$lib/icons/logo-text.svg';
 	import '../app.css';
 
-	let regDialog;
-	let renderDialogMap = false;
+	let { children } = $props();
+
+	let regDialog: HTMLDialogElement;
+	let renderDialogMap = $state(false);
+
+	let drawerToggle: HTMLInputElement;
 
 	function closeDrawer() {
-		document.getElementById('drawer').checked = false;
+		if (drawerToggle) {
+			drawerToggle.checked = false;
+		}
 	}
 </script>
 
 <svelte:head>
-	<title>{'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}</title>
-	<meta name="title" content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')} />
+	<title>{'Intermodal - ' + (page.data.title ?? 'Mobilidade amplificada')}</title>
+	<meta name="title" content={'Intermodal - ' + (page.data.title ?? 'Mobilidade amplificada')} />
 	<meta
 		property="og:title"
-		content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}
+		content={'Intermodal - ' + (page.data.title ?? 'Mobilidade amplificada')}
 	/>
 	<meta
 		property="twitter:title"
-		content={'Intermodal - ' + ($page.data.title ?? 'Mobilidade amplificada')}
+		content={'Intermodal - ' + (page.data.title ?? 'Mobilidade amplificada')}
 	/>
 	<meta
 		name="description"
-		content={$page.data.description ??
-			'A plataforma para a mobilidade. Informação na palma da mão.'}
+		content={page.data.description ?? 'A plataforma para a mobilidade. Informação na palma da mão.'}
 	/>
 	<meta
 		property="og:description"
-		content={$page.data.description ??
-			'A plataforma para a mobilidade. Informação na palma da mão.'}
+		content={page.data.description ?? 'A plataforma para a mobilidade. Informação na palma da mão.'}
 	/>
 	<meta
 		property="twitter:description"
-		content={$page.data.description ??
-			'A plataforma para a mobilidade. Informação na palma da mão.'}
+		content={page.data.description ?? 'A plataforma para a mobilidade. Informação na palma da mão.'}
 	/>
 </svelte:head>
 
 <div class="drawer grow">
-	<input id="drawer" type="checkbox" class="drawer-toggle" />
+	<input bind:this={drawerToggle} id="drawer" type="checkbox" class="drawer-toggle" />
 	<div class="drawer-content flex flex-col">
 		<div
-			class="w-[min(960px,100%)] mx-auto p-0 pb-4 lg:px-0 xl:pt-4 self-center"
-			class:absolute={$page.data.floatingMenu || false}
-			class:top-0={$page.data.floatingMenu || false}
-			class:z-[3000]={$page.data.floatingMenu || false}
-			class:hidden={$page.data.noMenu || false}
+			class={[
+				'w-[min(960px,100%)] mx-auto p-0 pb-4 lg:px-0 xl:pt-4 self-center',
+				page.data.floatingMenu && 'absolute top-0 z-3000',
+				page.data.noMenu && 'hidden'
+			]}
 		>
 			<div
 				class="navbar bg-base-100 sm:rounded-xl"
-				class:shadow-md={$page.data.floatingMenu}
-				class:shadow-sm={!$page.data.floatingMenu}
+				class:shadow-md={page.data.floatingMenu}
+				class:shadow-sm={!page.data.floatingMenu}
 			>
 				<div class="navbar-start">
 					<div>
@@ -100,57 +103,62 @@
 					<ul class="menu menu-horizontal p-0 gap-3">
 						<li>
 							{#if $selectedRegion}
-								<a href="/rede" class="p-3" class:menu-active={$page.url.pathname.startsWith('/rede')}
-									>Mapa</a
-								>
-							{:else}
 								<a
 									href="/rede"
 									class="p-3"
-									on:click={() => regDialog.showModal()}
-									on:keypress={() => regDialog.showModal()}>Mapa</a
+									class:menu-active={page.url.pathname.startsWith('/rede')}>Mapa</a
+								>
+							{:else}
+								<button
+									class="p-3"
+									onclick={() => regDialog.showModal()}
+									onkeypress={() => regDialog.showModal()}>Mapa</button
 								>
 							{/if}
 						</li>
 						<li>
-							<a href="/regiao" class="p-3" class:menu-active={$page.url.pathname.startsWith('/regiao')}
-								>Região</a
+							<a
+								href="/regiao"
+								class="p-3"
+								class:menu-active={page.url.pathname.startsWith('/regiao')}>Região</a
 							>
 						</li>
 						<li>
-							<a href="/edu" class="p-3" class:menu-active={$page.url.pathname.startsWith('/edu')}>
+							<a href="/edu" class="p-3" class:menu-active={page.url.pathname.startsWith('/edu')}>
 								Educação
 							</a>
 						</li>
 						<li>
 							<button
-								class="btn bg-base-200 hover:bg-base-300 border-0 h-full flex"
+								class="btn bg-base-200 hover:bg-base-300 border-0 h-full flex relative"
 								aria-label="Escolher região"
-								on:click={() => {
+								onclick={() => {
 									regDialog.showModal();
 									renderDialogMap = true;
 								}}
 							>
 								<img src={globe} alt="Escolher região" />
+								{#if !$selectedRegion}
+									<div aria-label="success" class="absolute top-1 left-1 status status-error"></div>
+								{/if}
 							</button>
 						</li>
 					</ul>
 				</div>
 			</div>
 		</div>
-
-		<slot />
+		{@render children()}
 	</div>
 	<div class="drawer-side z-10000">
-		<label for="drawer" aria-label="close sidebar" class="drawer-overlay" />
+		<label for="drawer" aria-label="close sidebar" class="drawer-overlay"></label>
 		<ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
-			<li><a href="/rede" on:click={closeDrawer} on:keypress={closeDrawer}>Mapa</a></li>
-			<li><a href="/regiao" on:click={closeDrawer} on:keypress={closeDrawer}>Região</a></li>
-			<li><a href="/edu" on:click={closeDrawer} on:keypress={closeDrawer}>Educação</a></li>
-			<span class="grow" />
+			<li><a href="/rede" onclick={closeDrawer}>Mapa</a></li>
+			<li><a href="/regiao" onclick={closeDrawer}>Região</a></li>
+			<li><a href="/edu" onclick={closeDrawer}>Educação</a></li>
+			<span class="grow"></span>
 			<button
 				class="flex flex-col bg-base-300 hover:bg-base-100 p-4 rounded-xl mb-3"
-				on:click={() => {
+				onclick={() => {
 					regDialog.showModal();
 					renderDialogMap = true;
 				}}
@@ -174,9 +182,7 @@
 	id="regdialog"
 	bind:this={regDialog}
 	class="modal modal-bottom sm:modal-middle"
-	on:close={() => {
-		renderDialogMap = false;
-	}}
+	onclose={() => (renderDialogMap = false)}
 >
 	<div class="modal-box max-w-[60em]!">
 		{#if $selectedRegion}
@@ -199,6 +205,14 @@
 	</form>
 </dialog>
 
-{#if $page.url.searchParams.get('debug')}
+{#if navigating.to}
+	<div
+		class="fixed inset-0 bg-white/20 backdrop-blur-sm z-40 flex items-end justify-end p-8"
+	>
+		<span class="loading loading-spinner text-primary loading-lg"></span>
+	</div>
+{/if}
+
+{#if page.url.searchParams.get('debug')}
 	<DbLoadingInfo />
 {/if}
