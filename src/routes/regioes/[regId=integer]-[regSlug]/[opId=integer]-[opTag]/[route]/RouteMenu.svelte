@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022  Cláudio Pereira
+    Copyright (C) 2022 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -14,32 +14,36 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { page } from '$app/stores';
+	import { page } from '$app/state';
+	import {
+		routeInfoWithinRegionUrl,
+		routePathWithinRegionUrl,
+		routeScheduleWithinRegionUrl,
+		routeStopsWithinRegionUrl
+	} from '$lib/urls';
 
-	export let regionId;
-	export let operatorTag;
-	export let route;
+	let { region, operator, route } = $props();
 </script>
 
-<div role="tablist" class="tabs tabs-bordered mx-auto mb-4">
+<div role="tablist" class="tabs tabs-border mb-4">
 	<a
-		href="/regioes/{regionId}/{operatorTag}/{route.id}/informacao"
+		href={routeInfoWithinRegionUrl(region, operator, route)}
 		class="tab tab-lg"
-		class:tab-active={$page.url.pathname.endsWith('informacao')}>Informação</a
+		class:tab-active={page.url.pathname.endsWith('informacao')}>Informação</a
 	>
 	<a
-		href="/regioes/{regionId}/{operatorTag}/{route.id}/horario"
+		href={routeScheduleWithinRegionUrl(region, operator, route)}
 		class="tab tab-lg"
-		class:tab-active={$page.url.pathname.endsWith('horario')}>Horário</a
+		class:tab-active={page.url.pathname.endsWith('horario')}>Horário</a
 	>
 	<a
-		href="/regioes/{regionId}/{operatorTag}/{route.id}/percurso"
+		href={routePathWithinRegionUrl(region, operator, route)}
 		class="tab tab-lg"
-		class:tab-active={$page.url.pathname.endsWith('percurso')}>Percurso</a
+		class:tab-active={page.url.pathname.endsWith('percurso')}>Percurso</a
 	>
 	<a
-		href="/regioes/{regionId}/{operatorTag}/{route.id}/paragens"
+		href={routeStopsWithinRegionUrl(region, operator, route)}
 		class="tab tab-lg"
-		class:tab-active={$page.url.pathname.endsWith('paragens')}>Paragens</a
+		class:tab-active={page.url.pathname.endsWith('paragens')}>Paragens</a
 	>
 </div>

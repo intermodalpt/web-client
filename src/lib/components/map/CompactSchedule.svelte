@@ -15,8 +15,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { writable, derived } from 'svelte/store';
-	import { buildSchedule } from '$lib/utils.js';
-	import { apiServer } from '$lib/settings.js';
+	import { buildSchedule } from '$lib/utils';
+	import { apiServer } from '$lib/settings';
 
 	export let selectedRoute;
 

@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -13,14 +13,14 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
-<script>
+<script lang="ts">
 	import { goto } from '$app/navigation';
 	import { browser } from '$app/environment';
-	import { selectedRegion, getRegion, loadMissing } from '$lib/db.js';
-	import { slugify } from '$lib/utils.js';
+	import { selectedRegion, getLocalRegion } from '$lib/db';
+	import { slugify } from '$lib/utils';
 	import RegionPicker from '$lib/components/RegionPicker.svelte';
+	import { regionUrl } from '$lib/urls.js';
 
-	/** @type {import('./$types').PageData} */
 	export let data;
 	const regions = data.regions;
 
@@ -29,10 +29,6 @@
 		index: 'index'
 	};
 	let mode = browser ? modes.map : modes.index;
-
-	loadMissing().then(() => {
-		console.log('Loaded missing data');
-	});
 </script>
 
 <div class="w-full">
@@ -55,10 +51,10 @@
 			</h2>
 			<div class:hidden={mode != modes.map}>
 				<RegionPicker
-					on:select={(e) => {
-						const id = e.detail.id;
-						getRegion(id).then((region) => {
-							goto(`/regioes/${id}-${slugify(region.name ?? '-')}`);
+					onselect={(id) => {
+						console.log('Selected region:', id);
+						getLocalRegion(id).then((region) => {
+							goto(regionUrl(region));
 						});
 					}}
 					setsUserRegion={false}
@@ -78,7 +74,7 @@
 			</div>
 			{#if $selectedRegion}
 				<a
-					class="btn btn-xl btn-secondary btn-lg"
+					class="btn btn-secondary btn-lg"
 					href="/regioes/{$selectedRegion?.id}-{slugify($selectedRegion?.name ?? '')}"
 					>Continuar em {$selectedRegion?.name}</a
 				>

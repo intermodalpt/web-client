@@ -1,6 +1,6 @@
 /*
     Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025 Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -18,24 +18,29 @@
 
 import { error } from '@sveltejs/kit';
 import { browser } from '$app/environment';
-import { apiServer } from '$lib/settings';
-import { fetchRegions, fetchOperators, getRegion, getOperator } from '$lib/db.js';
+import { fetchLocalRegions, fetchLocalOperators, getLocalRegion, getLocalOperator } from '$lib/db';
+import { getRegion } from '$lib/api';
 
 // export const prerender = true;
 export const ssr = true;
 export const csr = true;
 
-/** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
 	const regionId = parseInt(params.regId);
 	const operatorId = parseInt(params.opId);
 
 	if (browser) {
 		// Ensure that we have cached data
-		await Promise.all([fetchRegions(), fetchOperators()]);
+		await Promise.all([
+			fetchLocalRegions({ fetcher: fetch }),
+			fetchLocalOperators({ fetcher: fetch })
+		]);
 
 		// Make use of cached data
-		const [region, operator] = await Promise.all([getRegion(regionId), getOperator(operatorId)]);
+		const [region, operator] = await Promise.all([
+			getLocalRegion(regionId),
+			getLocalOperator(operatorId)
+		]);
 
 		if (!region) {
 			error(404, 'Região não encontrada');
@@ -52,24 +57,24 @@ export async function load({ params, fetch }) {
 		};
 	}
 
-	const regionsRes = await fetch(`${apiServer}/v1/regions/${regionId}`);
+	const region = await getRegion(regionId, {
+		onError: (res) => {
+			if (res.status === 404) {
+				error(404, 'Região não encontrada');
+			}
+			error(res.status, 'Problema ao obter região');
+		},
+		fetch
+	});
 
-	if (!regionsRes.ok) {
-		if (regionsRes.status === 404) {
-			error(404, 'Região não encontrada');
-		}
-		error('Problema ao obter região');
-	}
-
-	const regionData = await regionsRes.json();
-	const operator = regionData.operators.find((op) => op.id === operatorId);
+	const operator = region.operators.find((op) => op.id === operatorId);
 	if (!operator) {
 		error(404, 'Operador não encontrado nesta região');
 	}
 
 	return {
-		title: `Linhas de ${operator.name} em ${regionData?.name}`,
-		region: regionData,
+		title: `Linhas de ${operator.name} em ${region?.name}`,
+		region: region,
 		operator: operator
 	};
 }

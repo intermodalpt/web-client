@@ -14,8 +14,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { loadMissing } from '$lib/db.js';
-	import { operatorsWithIllustrations, secondaryOperators } from '$lib/settings.js';
+	import { loadMissing } from '$lib/db';
+	import { operatorsWithIllustrations, secondaryOperators } from '$lib/settings';
 	import { regionUrl, operatorWithinRegionUrl } from '$lib/urls';
 
 	/** @type {import('./$types').PageData} */
@@ -56,7 +56,7 @@
 					{#if op.logo_url}
 						{#if operatorsWithIllustrations.has(op.id)}
 							<a
-								class="border rounded-xl cursor-pointer h-24 p-2 bg-origin-content! bg-contain! hover:bg-zinc-50! hidden md:flex flex-col justify-between items-stretch"
+								class="border border-base-300 rounded-xl cursor-pointer h-24 p-2 bg-origin-content! bg-contain! hover:bg-zinc-50! hidden md:flex flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 								style="background: bottom 0.2em right no-repeat url('/operators/{op.tag}/vehicle.svg')"
 							>
@@ -67,7 +67,7 @@
 								<span class="text-xl font-bold">{op.name}</span>
 							</a>
 							<a
-								class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex md:hidden flex-col justify-between items-stretch"
+								class="border border-base-300 rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex md:hidden flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 							>
 								<span
@@ -78,7 +78,7 @@
 							</a>
 						{:else}
 							<a
-								class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-between items-stretch"
+								class="border border-base-300 rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-between items-stretch"
 								href={operatorWithinRegionUrl(region, op)}
 							>
 								<span
@@ -90,7 +90,7 @@
 						{/if}
 					{:else}
 						<a
-							class="border rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-end items-stretch"
+							class="border border-base-300 rounded-xl cursor-pointer hover:bg-zinc-50! h-24 p-2 flex flex-col justify-end items-stretch"
 							href={operatorWithinRegionUrl(region, op)}
 						>
 							<span class="text-xl font-bold">{op.name}</span>

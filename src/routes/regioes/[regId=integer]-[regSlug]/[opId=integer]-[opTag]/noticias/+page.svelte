@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022 - 2025  Cláudio Pereira
+    Copyright (C) 2022 - 2024  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -16,12 +16,20 @@
 <script>
 	import { loadMissing } from '$lib/db';
 	import { regionUrl, operatorWithinRegionUrl } from '$lib/urls';
-	import Navigation from './Navigation.svelte';
+	import Navigation from '../Navigation.svelte';
 
-	let { data } = $props();
+	/** @type {import('./$types').PageData} */
+	export let data;
 
 	const region = data.region;
 	const operator = data.operator;
+
+	async function loadData() {}
+
+	loadData().then(async () => {
+		console.log('data loaded');
+		await loadMissing();
+	});
 </script>
 
 <div class="card bg-base-100 shadow-xs">
@@ -48,6 +56,6 @@
 			</ul>
 		</div>
 
-		<Navigation {region} {operator} page="root" />
+		<Navigation {region} {operator} page="news" />
 	</div>
 </div>

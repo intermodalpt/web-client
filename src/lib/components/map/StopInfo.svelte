@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import RouteListing from '$lib/components/map/RouteListing.svelte';
-	import { sensibleLengthStopName, stopScore, stopScoreClass } from '$lib/utils.js';
+	import { sensibleLengthStopName, stopScore, stopScoreClass } from '$lib/utils';
 	import { createEventDispatcher } from 'svelte';
 	import StopAttrs from '$lib/components/StopAttrs.svelte';
 	import picturePlaceholder from '$lib/icons/picture.svg';

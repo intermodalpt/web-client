@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022  Cláudio Pereira
+    Copyright (C) 2022 - 2025 Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -14,14 +14,8 @@
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
-	import { createEventDispatcher } from 'svelte';
-	import { page } from '$app/stores';
-
-	export let subrouteStops;
-
+	let { subrouteStops, onclick } = $props();
 	let selectedId = 0;
-
-	const dispatch = createEventDispatcher();
 
 	function sensibleLengthStopName(stop) {
 		return stop.short_name || stop.name || stop.official_name || stop.osm_name;
@@ -29,32 +23,15 @@
 
 	function stopClicked(stop) {
 		selectedId = stop.id;
-		dispatch('stopClicked', { stop: stop });
-	}
-
-	if (subrouteStops === undefined) {
-		console.log('no stops for');
-		console.log($page);
+		onclick?.(stop);
+		// dispatch('stopClicked', { stop: stop });
 	}
 </script>
 
 <ul class="overflow-y-scroll steps steps-vertical w-full">
 	{#each subrouteStops as stop, i}
-		<!-- <li
-			on:mouseup={() => stopClicked(stop)}
-			class="step hover:bg-base-200 rounded-xl cursor-pointer"
-			class:step-primary={selectedId == stop.id}
-		>
+		<a href="/paragens/{stop}" target="_blank" rel="noopener noreferrer" class="step">
 			{sensibleLengthStopName(stop)}
-		</li> -->
-
-		<a href="/paragens/{stop.id}" target="_blank" rel="noopener noreferrer">
-			<li
-				class="step hover:bg-base-200 rounded-xl cursor-pointer"
-				class:step-primary={selectedId == stop.id}
-			>
-				{sensibleLengthStopName(stop)}
-			</li>
 		</a>
 	{/each}
 </ul>

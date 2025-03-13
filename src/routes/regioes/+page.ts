@@ -1,6 +1,6 @@
 /*
     Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -16,30 +16,25 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 import { browser } from '$app/environment';
-import { getRegions, fetchRegions } from '$lib/db.js';
-import { apiServer } from '$lib/settings';
+import { getRegions } from '$lib/api';
+import { getLocalRegions, fetchLocalRegions } from '$lib/db';
+import { error } from '@sveltejs/kit';
 
-export const csr = true;
-export const ssr = true;
-export const prerender = false;
-
-/** @type {import('./$types').PageLoad} */
-export async function load() {
+export async function load({ fetch }) {
 	if (browser) {
-		await fetchRegions();
+		await fetchLocalRegions({ fetcher: fetch });
 
 		return {
-			regions: await getRegions()
+			regions: await getLocalRegions()
 		};
 	} else {
-		const res = await fetch(`${apiServer}/v1/regions`);
+		const regions = await getRegions({
+			onError: async (err) => {
+				error(err.status, JSON.stringify(await err.json()));
+			},
+			fetch
+		});
 
-		if (!res.ok) {
-			error();
-		}
-
-		return {
-			regions: await res.json()
-		};
+		return { regions };
 	}
 }

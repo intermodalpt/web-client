@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022 - 2024  Cláudio Pereira
+    Copyright (C) 2022 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -15,35 +15,28 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { goto } from '$app/navigation';
-	import { loadMissing } from '$lib/db.js';
-	import { regionUrl, operatorWithinRegionUrl, routeWithinRegionUrl } from '$lib/urls.js';
+	import { regionUrl, operatorWithinRegionUrl, routeWithinRegionUrl } from '$lib/urls';
 	import Navigation from '../Navigation.svelte';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	let { data } = $props();
 
 	const routes = data.routes;
 	const region = data.region;
 	const operator = data.operator;
 
-	$: sortedRoutes = routes.sort((a, b) => {
-		if (a.code && !b.code) return -1;
-		if (!a.code && b.code) return 1;
+	let sortedRoutes = $derived(
+		routes.sort((a, b) => {
+			if (a.code && !b.code) return -1;
+			if (!a.code && b.code) return 1;
 
-		const aIntCode = parseInt(a.code);
-		const bIntConde = parseInt(b.code);
-		if (aIntCode && bIntConde) return aIntCode - bIntConde;
+			const aIntCode = parseInt(a.code);
+			const bIntConde = parseInt(b.code);
+			if (aIntCode && bIntConde) return aIntCode - bIntConde;
 
-		if (a.code && b.code) return a.code.localeCompare(b.code);
-		return a.name.localeCompare(b.name);
-	});
-
-	async function loadData() {}
-
-	loadData().then(async () => {
-		console.log('data loaded');
-		await loadMissing();
-	});
+			if (a.code && b.code) return a.code.localeCompare(b.code);
+			return a.name.localeCompare(b.name);
+		})
+	);
 
 	let zoneName = null;
 

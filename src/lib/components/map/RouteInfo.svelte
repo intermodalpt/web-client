@@ -15,7 +15,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
 <script>
 	import { createEventDispatcher } from 'svelte';
-	import { operators } from '$lib/stores.js';
+	import { operators } from '$lib/stores';
 	import WHeader from '$lib/components/map/WidgetHeader.svelte';
 
 	export let route;

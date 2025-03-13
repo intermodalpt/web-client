@@ -16,24 +16,36 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { get } from 'svelte/store';
 import { error } from '@sveltejs/kit';
 import { browser } from '$app/environment';
-import { fetchRegions, getRegion, fetchOperators, getOperators } from '$lib/db.js';
-import { apiServer } from '$lib/settings';
+import {
+	fetchLocalRegions,
+	getLocalRegion,
+	fetchLocalOperators,
+	getLocalOperators,
+	regionId as regionIdStore
+} from '$lib/db';
+import { getRegion } from '$lib/api';
 
 export const csr = true;
 export const ssr = true;
 export const prerender = false;
 
-/** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
 	const regionId = parseInt(params.regId);
 
-	if (browser) {
-		await Promise.all([fetchOperators(), fetchRegions()]);
+	if (browser && regionId == get(regionIdStore)) {
+		await Promise.all([
+			fetchLocalOperators({ fetcher: fetch }),
+			fetchLocalRegions({ fetcher: fetch })
+		]);
 
-		const operators = await getOperators();
-		const region = await getRegion(regionId);
+		const [operators, region] = await Promise.all([getLocalOperators(), getLocalRegion(regionId)]);
+		if (!region) {
+			error(404, 'Região não encontrada');
+		}
+
 		const regionOperators = Object.values(operators).filter((op) => op.regions.includes(regionId));
 
 		return {
@@ -41,23 +53,22 @@ export async function load({ params, fetch }) {
 			region: region,
 			operators: regionOperators
 		};
-	} else {
-		const res = await fetch(`${apiServer}/v1/regions/${regionId}`);
-
-		if (!res.ok) {
-			if (res.status === 404) {
-				error(404, 'Região não encontrada');
-			}
-
-			error();
-		}
-
-		const regionData = await res.json();
-
-		return {
-			title: `Região de ${regionData.name}`,
-			region: regionData,
-			operators: regionData.operators
-		};
 	}
+
+	let region = await getRegion(regionId, {
+		onError: async (err) => {
+			if (err.status === 404) {
+				error(404, 'Região não encontrada');
+			} else {
+				error(err.status, JSON.stringify(await err.json()));
+			}
+		},
+		fetch
+	});
+
+	return {
+		title: `Região de ${region.name}`,
+		region: region,
+		operators: region.operators
+	};
 }

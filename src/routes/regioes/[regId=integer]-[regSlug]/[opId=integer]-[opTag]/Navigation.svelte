@@ -1,5 +1,5 @@
 <script>
-	import { operatorWithinRegionUrl } from '$lib/urls.js';
+	import { operatorWithinRegionUrl } from '$lib/urls';
 
 	export let region;
 	export let operator;

@@ -1,6 +1,6 @@
 /*
     Intermodal, transportation information aggregator
-    Copyright (C) 2024  Cláudio Pereira
+    Copyright (C) 2024 - 2025 Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -16,29 +16,47 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { get } from 'svelte/store';
 import { error } from '@sveltejs/kit';
 import { browser } from '$app/environment';
-import { apiServer } from '$lib/settings';
-import { fetchRegions, fetchOperators, getRegion, getOperator } from '$lib/db.js';
+import {
+	fetchLocalRegions,
+	fetchLocalOperators,
+	getLocalRegion,
+	getLocalOperator,
+	regionId as regionIdStore
+} from '$lib/db';
+import { getOperatorRoutes, getRegion } from '$lib/api';
 
 // export const prerender = true;
 export const ssr = true;
 export const csr = true;
 
-/** @type {import('./$types').PageLoad} */
 export async function load({ params, fetch }) {
 	const regionId = parseInt(params.regId);
 	const operatorId = parseInt(params.opId);
 
-	if (browser) {
+	if (browser && regionId == get(regionIdStore)) {
 		// Ensure that we have cached data
-		await Promise.all([fetchRegions(), fetchOperators()]);
+		await Promise.all([
+			fetchLocalRegions({ fetcher: fetch }),
+			fetchLocalOperators({ fetcher: fetch })
+		]);
 
 		// Make use of cached data
-		const [region, operator, routesRes] = await Promise.all([
-			getRegion(regionId),
-			getOperator(operatorId),
-			fetch(`${apiServer}/v1/operators/${operatorId}/routes`)
+		const [region, operator, routes] = await Promise.all([
+			getLocalRegion(regionId),
+			getLocalOperator(operatorId),
+			getOperatorRoutes(operatorId, {
+				onError: (err) => {
+					if (err.status === 404) {
+						error(404, 'Operador não encontrado nesta região');
+					} else {
+						error(err.status, 'Problema ao obter linhas');
+					}
+				},
+				fetch
+			})
 		]);
 
 		if (!region) {
@@ -49,50 +67,44 @@ export async function load({ params, fetch }) {
 			error(404, 'Operador não encontrado');
 		}
 
-		if (!routesRes.ok) {
-			routesRes.status === 404
-				? error(404, 'Operador não encontrado nesta região')
-				: error('Problema ao obter linhas');
-			return;
-		}
-
 		return {
 			title: `Linhas ${operator.name} em ${region.name}`,
 			region: region,
 			operator: operator,
-			routes: await routesRes.json()
+			routes: routes
 		};
 	}
 
-	const [regionsRes, routesRes] = await Promise.all([
-		fetch(`${apiServer}/v1/regions/${regionId}`),
-		fetch(`${apiServer}/v1/operators/${operatorId}/routes`)
+	const [region, routes] = await Promise.all([
+		getRegion(regionId, {
+			onError: (err) => {
+				if (err.status === 404) {
+					error(404, 'Região não encontrada');
+				}
+				error(err.status, 'Problema ao obter região');
+			},
+			fetch
+		}),
+		getOperatorRoutes(operatorId, {
+			onError: (err) => {
+				if (err.status === 404) {
+					error(404, 'Operador não encontrado nesta região');
+				}
+				error(err.status, 'Problema ao obter linhas');
+			},
+			fetch
+		})
 	]);
 
-	if (!regionsRes.ok) {
-		if (regionsRes.status === 404) {
-			error(404, 'Região não encontrada');
-		}
-		error('Problema ao obter região');
-	}
-
-	if (!routesRes.ok) {
-		if (routesRes.status === 404) {
-			error(404, 'Operador não encontrado');
-		}
-		error('Problema ao obter linhas');
-	}
-
-	const regionData = await regionsRes.json();
-	const operator = regionData.operators.find((op) => op.id === operatorId);
+	const operator = region.operators.find((op) => op.id === operatorId);
 	if (!operator) {
 		error(404, 'Operador não encontrado nesta região');
 	}
 
 	return {
-		title: `Linhas ${operator.name} em ${regionData?.name}`,
-		region: regionData,
+		title: `Linhas ${operator?.name} em ${region?.name}`,
+		region: region,
 		operator: operator,
-		routes: await routesRes.json()
+		routes: routes
 	};
 }
