@@ -1,5 +1,5 @@
 <!-- Intermodal, transportation information aggregator
-    Copyright (C) 2022 - 2024  Cláudio Pereira
+    Copyright (C) 2022 - 2025  Cláudio Pereira
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU Affero General Public License as
@@ -13,46 +13,32 @@
 
     You should have received a copy of the GNU Affero General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>. -->
-<script>
+
+<script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { writable, derived } from 'svelte/store';
-	import { Map as Maplibre, NavigationControl } from 'maplibre-gl';
+	import maplibre from 'maplibre-gl';
 	import 'maplibre-gl/dist/maplibre-gl.css';
 	import polyline from '@mapbox/polyline';
 	import { liveQuery } from 'dexie';
-	import { apiServer, tileStyle } from '$lib/settings.js';
-	import { operators } from '$lib/stores.js';
-	import { stopScore, stopScoreClass, longStopName } from '$lib/utils.js';
-	import {
-		fetchRoutes,
-		getRoutes,
-		fetchStops,
-		getStops,
-		loadMissing,
-		stopsLoaded,
-		routesLoaded
-	} from '$lib/db';
+	import { apiServer, tileStyle } from '$lib/settings';
+	import { operators } from '$lib/stores';
+	import { stopScore, stopScoreClass, longStopName } from '$lib/utils';
 	import StopAttrs from '$lib/components/StopAttrs.svelte';
+	import { getLocalRoutes, getLocalStops } from '$lib/db';
 
-	/** @type {import('./$types').PageData} */
-	export let data;
+	let { data } = $props();
+	let { stop, pictures, spider } = data;
 
-	const stopId = data.stopId;
-	const stop = data.stop;
-
-	const stops = liveQuery(() => getStops());
-	const routes = liveQuery(() => getRoutes());
-	const pictures = writable(null);
-	const spider = writable(null);
+	const stops = liveQuery(() => getLocalStops());
+	const routes = liveQuery(() => getLocalRoutes());
 
 	const score = stopScore(stop);
 
-	const accessibleRoutes = derived([routes, spider], ([$routes, $spider]) => {
-		if (!$routesLoaded || !$spider) return null;
+	const accessibleRoutes = derived(routes, ($routes) => {
+		if (!$routes) return null;
 
-		console.log($routes);
-
-		return Object.keys($spider.routes)
+		return Object.keys(spider.routes)
 			.map((routeId) => {
 				return $routes[routeId];
 			})
@@ -68,41 +54,16 @@
 			});
 	});
 
-	let map;
-	let mapEl;
+	let map: maplibre.Map;
+	let mapEl: HTMLDivElement;
 	let mapLoaded = false;
-
-	async function loadData() {
-		await Promise.all([
-			fetchStops(),
-			fetchRoutes(),
-			fetch(`${apiServer}/v1/stops/${stopId}/pictures`)
-				.then((r) => r.json())
-				.then((data) => {
-					pictures.set(data);
-				}),
-			fetch(`${apiServer}/v1/stops/${stopId}/spider`)
-				.then((r) => r.json())
-				.then((data) => {
-					spider.set(data);
-				})
-		]);
-	}
-	loadData().then(async () => {
-		console.log('data loaded');
-		await loadMissing();
-	});
 
 	stops.subscribe(() => {
 		addStopDataToMap();
 	});
 
-	spider.subscribe(() => {
-		addSpiderDataToMap();
-	});
-
 	function addStopDataToMap() {
-		if (!mapLoaded) {
+		if (!mapLoaded || !$stops) {
 			return;
 		}
 
@@ -134,11 +95,11 @@
 	}
 
 	function addSpiderDataToMap() {
-		if (!$spider || !mapLoaded) {
+		if (!spider || !mapLoaded) {
 			return;
 		}
-		let stops = $spider.stops;
-		const features = Object.values($spider.subroutes).map((subroute) => {
+		let stops = spider.stops;
+		const features = Object.values(spider.subroutes).map((subroute) => {
 			return {
 				type: 'Feature',
 				geometry: {
@@ -281,7 +242,7 @@
 	}
 
 	onMount(() => {
-		map = new Maplibre({
+		map = new maplibre.Map({
 			container: mapEl,
 			style: tileStyle,
 			center: [stop.lon, stop.lat],
@@ -290,7 +251,7 @@
 			maxZoom: 20
 		});
 
-		map.addControl(new NavigationControl(), 'top-right');
+		map.addControl(new maplibre.NavigationControl(), 'top-right');
 
 		map.on('load', function () {
 			addSourcesAndLayers();
@@ -303,17 +264,17 @@
 
 	onDestroy(() => {
 		mapLoaded = false;
-		map.remove();
+		map?.remove();
 	});
 </script>
 
 <div class="flex flex-col w-full gap-4 my-2 px-2">
 	<div class="card w-full bg-base-100 shadow-md">
 		<figure>
-			{#if $pictures?.length}
+			{#if pictures?.length}
 				<div
 					class="bg-cover bg-no-repeat bg-center transition-all hover:scale-110 h-32 lg:h-40 w-full"
-					style="background-image: url('{$pictures[0].url_medium}')"
+					style="background-image: url('{pictures[0].url_medium}')"
 				/>
 			{:else}
 				<!-- TODO put some placeholder here-->
@@ -325,7 +286,7 @@
 				{longStopName(stop)}
 				<span class="stopScore p-1 rounded-full border-2 {stopScoreClass(score)}">{score}</span>
 			</h2>
-			<StopAttrs {stop} showSecondary={false}/>
+			<StopAttrs {stop} showSecondary={false} />
 			<table class="table table-zebra table-compact w-full">
 				<thead>
 					<tr>
@@ -335,46 +296,43 @@
 				<tbody>
 					{#each $accessibleRoutes || [] as route}
 						<tr class="cursor-pointer hover">
-							<a href="/servicos/{operators[route.operator]?.tag}/{route.id}/informacao">
-								<th>
-									{#if route.code}
-										<span
-											class="line-number"
-											style="background-color: {route.badge_bg}; color: {route.badge_text}; border: 2px solid {route.badge_text};"
-										>
-											{route.code}
-										</span>
-									{/if}
-								</th>
-								<td class="w-full">{route.name}</td>
-							</a>
+							<th>
+								{#if route.code}
+									<span
+										class="line-number"
+										style="background-color: {route.badge_bg}; color: {route.badge_text}; border: 2px solid {route.badge_text};"
+									>
+										{route.code}
+									</span>
+								{/if}
+							</th>
+							<td class="w-full">{route.name}</td>
 						</tr>
 					{/each}
 				</tbody>
 			</table>
-			<StopAttrs {stop} showPrimary={false}/>
+			<StopAttrs {stop} showPrimary={false} />
 		</div>
 	</div>
 	<div class="card card-sm w-full bg-base-100 shadow-md">
 		<div class="card-body">
 			<h2 class="card-title">Fotografias</h2>
-			{#if $pictures?.length}
+			{#if pictures?.length}
 				<div class="grid grid-cols-2">
-					{#each $pictures as picture}
+					{#each pictures as picture}
 						{#if !picture.tagged}
 							<div class="p-1 flex justify-center items-center cursor-pointer">
-								<a
-									href="https://intermodal-storage-worker.claudioap.workers.dev/medium/{picture.sha1}/preview"
+								<button
+									onclick={() => {
+										// openPic(picture.id);
+									}}
 								>
 									<img
 										src="https://intermodal-storage-worker.claudioap.workers.dev/medium/{picture.sha1}/preview"
 										class="rounded-lg transition-all hover:scale-105"
-										on:click={() => {
-											openPic(picture.id);
-										}}
 										alt="Fotografia da paragem"
 									/>
-								</a>
+								</button>
 							</div>
 						{/if}
 					{/each}
